@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { handleError } from '@/lib/auth/errors';
 import { computeCartSummary, switchCartBranch } from '@/lib/cart';
 import { cartBranchSchema } from '@/lib/cart-schemas';
@@ -11,6 +12,7 @@ export const runtime = 'nodejs';
 /** Switch the cart to another branch — existing items are cleared. */
 export async function POST(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     const input = cartBranchSchema.parse(await req.json());
 

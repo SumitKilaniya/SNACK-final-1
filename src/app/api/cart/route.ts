@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { handleError } from '@/lib/auth/errors';
 import { clearCart, computeCartSummary, DELIVERY_FEE } from '@/lib/cart';
 import { auditLog } from '@/lib/auth/audit';
@@ -32,6 +33,7 @@ export async function GET(req: NextRequest) {
 /** Empty the cart. */
 export async function DELETE(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     await clearCart(authed.user.id);
     await auditLog({ userId: authed.user.id, action: 'cart_cleared', ...requestContext(req) });

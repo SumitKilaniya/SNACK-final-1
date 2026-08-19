@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ApiError, handleError } from '@/lib/auth/errors';
 import { requireAuth, requireBranchAccess, requireRole } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { prisma } from '@/lib/auth/prisma';
 import { requestContext } from '@/lib/auth/rate-limit';
 import { auditLog } from '@/lib/auth/audit';
@@ -12,6 +13,7 @@ export const runtime = 'nodejs';
 export async function GET(req: NextRequest, { params }: { params: Promise<{ branchId: string }> }) {
   try {
     const { branchId } = await params;
+    assertSameOrigin(req);
     const authed = await requireBranchAccess(req, branchId);
 
     const branch = await prisma.branch.findUnique({
@@ -51,6 +53,7 @@ export async function PATCH(
 ) {
   try {
     const { branchId } = await params;
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     requireRole('SUPER_ADMIN')(authed);
 
@@ -91,6 +94,7 @@ export async function DELETE(
 ) {
   try {
     const { branchId } = await params;
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     requireRole('SUPER_ADMIN')(authed);
 

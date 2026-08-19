@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '@/lib/auth/prisma';
 import { ApiError, handleError } from '@/lib/auth/errors';
 import { requireAuth, requireRole } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { hashPassword } from '@/lib/auth/password';
 import { requestContext } from '@/lib/auth/rate-limit';
 import { auditLog } from '@/lib/auth/audit';
@@ -24,6 +25,7 @@ const createUserSchema = z.object({
  */
 export async function GET(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     requireRole('SUPER_ADMIN')(authed);
 
@@ -90,11 +92,12 @@ export async function GET(req: NextRequest) {
 
 /** Super admin: provision a branch admin / super admin account. */
 export async function POST(req: NextRequest) {
-  try {
+  try {    assertSameOrigin(req);
     const authed = await requireAuth(req);
     requireRole('SUPER_ADMIN')(authed);
 
-    const body = await req.json().catch(() => {
+    const body = await req.json()
+      .catch(() => {
       throw new ApiError(400, 'Invalid request body', 'BAD_REQUEST');
     });
     const input = createUserSchema.parse(body);

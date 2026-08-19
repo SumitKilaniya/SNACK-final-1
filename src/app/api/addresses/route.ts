@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { handleError } from '@/lib/auth/errors';
 import { prisma } from '@/lib/auth/prisma';
 import { addressCreateSchema } from '@/lib/cart-schemas';
@@ -25,6 +26,7 @@ export async function GET(req: NextRequest) {
 /** Save a new address (ownership always scoped to the caller). */
 export async function POST(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     const input = addressCreateSchema.parse(await req.json());
 

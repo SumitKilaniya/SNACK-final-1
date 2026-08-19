@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ApiError, handleError } from '@/lib/auth/errors';
 import { requireAuth } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { prisma } from '@/lib/auth/prisma';
 import { requestContext } from '@/lib/auth/rate-limit';
 import { auditLog } from '@/lib/auth/audit';
@@ -19,6 +20,7 @@ const ACTIVE = ['PLACED', 'ACCEPTED_BY_BRANCH', 'PREPARING', 'READY_OR_OUT_FOR_D
  */
 export async function GET(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
 
     const sp = req.nextUrl.searchParams;

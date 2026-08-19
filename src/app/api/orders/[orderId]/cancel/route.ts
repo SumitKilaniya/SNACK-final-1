@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ApiError, forbidden, handleError } from '@/lib/auth/errors';
 import { requireAuth } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { prisma } from '@/lib/auth/prisma';
 import { transitionOrder } from '@/lib/orders';
 import { auditLog } from '@/lib/auth/audit';
@@ -11,6 +12,7 @@ export const runtime = 'nodejs';
 /** Cancel the caller's own order — only within the 5-minute window. */
 export async function POST(req: NextRequest, { params }: { params: Promise<{ orderId: string }> }) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     const { orderId } = await params;
 

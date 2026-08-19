@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ApiError, handleError } from '@/lib/auth/errors';
 import { requireAuth } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { prisma } from '@/lib/auth/prisma';
 import { addressUpdateSchema } from '@/lib/cart-schemas';
 import { auditLog } from '@/lib/auth/audit';
@@ -11,6 +12,7 @@ export const runtime = 'nodejs';
 /** Update one of the caller's own addresses. */
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     const { id } = await params;
 
@@ -55,6 +57,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 /** Delete one of the caller's own addresses. */
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     const { id } = await params;
 

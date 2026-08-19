@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { handleError, ApiError } from '@/lib/auth/errors';
 import { prisma } from '@/lib/auth/prisma';
 import { reviewCreateSchema, reviewListQuerySchema, type ReviewListItem, type PaginatedReviews } from '@/lib/review-schemas';
@@ -62,6 +63,7 @@ export async function GET(req: NextRequest) {
 /** Auth required: create a review. 409 if one already exists for this user+item. */
 export async function POST(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
 
     const hit = await checkRateLimit(`review:create:${authed.user.id}`, {

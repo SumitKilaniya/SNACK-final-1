@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { forbidden, handleError } from '@/lib/auth/errors';
 import { requireAuth } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { prisma } from '@/lib/auth/prisma';
 import { requestContext } from '@/lib/auth/rate-limit';
 import { auditLog } from '@/lib/auth/audit';
@@ -17,6 +18,7 @@ const ACTIVE = ['PLACED', 'ACCEPTED_BY_BRANCH', 'PREPARING', 'READY_OR_OUT_FOR_D
  */
 export async function GET(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     if (authed.user.role !== 'SUPER_ADMIN' && authed.user.role !== 'BRANCH_ADMIN') {
       throw forbidden();

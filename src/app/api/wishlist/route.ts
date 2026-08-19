@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { handleError, ApiError } from '@/lib/auth/errors';
 import { prisma } from '@/lib/auth/prisma';
 import { wishlistAddSchema } from '@/lib/review-schemas';
@@ -58,6 +59,7 @@ export async function GET(req: NextRequest) {
 /** POST /api/wishlist — idempotent: adding an already-wishlisted item succeeds. */
 export async function POST(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
 
     const ip = clientIp(req);

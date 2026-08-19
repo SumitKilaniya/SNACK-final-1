@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ApiError, handleError } from '@/lib/auth/errors';
 import { requireAuth, requireRole, requireBranchAccess } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { prisma } from '@/lib/auth/prisma';
 import { refundOrderPayment } from '@/lib/payments/service';
 import { auditLog } from '@/lib/auth/audit';
@@ -16,6 +17,7 @@ export const runtime = 'nodejs';
  */
 export async function POST(req: NextRequest, { params }: { params: Promise<{ orderId: string }> }) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     requireRole('SUPER_ADMIN', 'BRANCH_ADMIN')(authed);
     const { orderId } = await params;

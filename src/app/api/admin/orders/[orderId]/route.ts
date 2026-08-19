@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ApiError, handleError } from '@/lib/auth/errors';
 import { requireAuth, requireBranchAccess } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { prisma } from '@/lib/auth/prisma';
 import { getOrderDetail, transitionOrder } from '@/lib/orders';
 import { adminOrderStatusSchema } from '@/lib/order-schemas';
@@ -12,6 +13,7 @@ export const runtime = 'nodejs';
 /** Branch-scoped admin view of one order (with items, address, timeline). */
 export async function GET(req: NextRequest, { params }: { params: Promise<{ orderId: string }> }) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     const { orderId } = await params;
 
@@ -43,6 +45,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ orde
  */
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ orderId: string }> }) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     const { orderId } = await params;
 

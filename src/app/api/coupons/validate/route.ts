@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { handleError } from '@/lib/auth/errors';
 import { validateAndComputeCoupon } from '@/lib/coupons';
 import { couponValidateSchema } from '@/lib/coupon-schemas';
@@ -17,6 +18,7 @@ export const runtime = 'nodejs';
  */
 export async function POST(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
 
     const hit = await checkRateLimit(`coupon-validate:${authed.user.id}`, {

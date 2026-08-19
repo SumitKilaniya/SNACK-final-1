@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth, requireRole } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { handleError } from '@/lib/auth/errors';
 import { prisma } from '@/lib/auth/prisma';
 import { requestContext } from '@/lib/auth/rate-limit';
@@ -12,6 +13,7 @@ export const runtime = 'nodejs';
 /** Super admin: list every branch (active + inactive) with user counts. */
 export async function GET(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     requireRole('SUPER_ADMIN')(authed);
 
@@ -45,6 +47,7 @@ export async function GET(req: NextRequest) {
 /** Super admin: create a branch. */
 export async function POST(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     requireRole('SUPER_ADMIN')(authed);
 

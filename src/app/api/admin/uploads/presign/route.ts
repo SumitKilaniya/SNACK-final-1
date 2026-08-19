@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireAuth, requireRole } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { handleError } from '@/lib/auth/errors';
 import { requestContext } from '@/lib/auth/rate-limit';
 import { auditLog } from '@/lib/auth/audit';
@@ -21,6 +22,7 @@ const presignSchema = z.object({
  */
 export async function POST(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     requireRole('SUPER_ADMIN')(authed);
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth, requireRole } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { handleError, ApiError } from '@/lib/auth/errors';
 import { prisma } from '@/lib/auth/prisma';
 import { z } from 'zod';
@@ -19,6 +20,7 @@ export async function PATCH(
   { params }: { params: Promise<{ reviewId: string }> },
 ) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     requireRole('SUPER_ADMIN')(authed);
     const { reviewId } = await params;
@@ -56,6 +58,7 @@ export async function DELETE(
   { params }: { params: Promise<{ reviewId: string }> },
 ) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     requireRole('SUPER_ADMIN')(authed);
     const { reviewId } = await params;

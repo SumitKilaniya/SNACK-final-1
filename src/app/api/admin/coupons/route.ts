@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/auth/prisma';
 import { ApiError, handleError } from '@/lib/auth/errors';
 import { requireAuth, requireRole } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { couponCreateSchema } from '@/lib/coupon-schemas';
 import { requestContext } from '@/lib/auth/rate-limit';
 import { auditLog } from '@/lib/auth/audit';
@@ -11,6 +12,7 @@ export const runtime = 'nodejs';
 /** Super admin: list every coupon with redemption counts and branch scope. */
 export async function GET(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     requireRole('SUPER_ADMIN')(authed);
 
@@ -66,6 +68,7 @@ export async function GET(req: NextRequest) {
 /** Super admin: create a coupon. */
 export async function POST(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     requireRole('SUPER_ADMIN')(authed);
 
