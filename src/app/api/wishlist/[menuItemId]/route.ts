@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { ApiError, handleError } from '@/lib/auth/errors';
 import { prisma } from '@/lib/auth/prisma';
 import { auditLog } from '@/lib/auth/audit';
@@ -13,6 +14,7 @@ export async function DELETE(
   { params }: { params: Promise<{ menuItemId: string }> },
 ) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
 
     const ip = clientIp(req);

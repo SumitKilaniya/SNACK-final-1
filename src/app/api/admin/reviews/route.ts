@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth, requireRole } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { handleError } from '@/lib/auth/errors';
 import { prisma } from '@/lib/auth/prisma';
 import { adminReviewListQuerySchema } from '@/lib/review-schemas';
@@ -11,6 +12,7 @@ export const runtime = 'nodejs';
 /** Super admin: list ALL reviews (including hidden) for moderation. */
 export async function GET(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     requireRole('SUPER_ADMIN')(authed);
 

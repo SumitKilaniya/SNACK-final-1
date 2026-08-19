@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { handleError } from '@/lib/auth/errors';
 import { computeCartSummary, removeCartItem, setCartQuantity } from '@/lib/cart';
 import { cartQtySchema } from '@/lib/cart-schemas';
@@ -12,6 +13,7 @@ export async function PATCH(
   { params }: { params: Promise<{ itemId: string }> }
 ) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     const { itemId } = await params;
     const input = cartQtySchema.parse(await req.json());
@@ -30,6 +32,7 @@ export async function DELETE(
   { params }: { params: Promise<{ itemId: string }> }
 ) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     const { itemId } = await params;
 

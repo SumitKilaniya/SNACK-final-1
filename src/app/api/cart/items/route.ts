@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { ApiError, handleError } from '@/lib/auth/errors';
 import { addItemToCart } from '@/lib/cart';
 import { cartAddSchema } from '@/lib/cart-schemas';
@@ -16,6 +17,7 @@ export const runtime = 'nodejs';
  */
 export async function POST(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
 
     const ip = clientIp(req);

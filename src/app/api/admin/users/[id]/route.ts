@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { prisma } from '@/lib/auth/prisma';
 import { ApiError, handleError } from '@/lib/auth/errors';
 import { requireAuth, requireRole } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { requestContext } from '@/lib/auth/rate-limit';
 import { auditLog } from '@/lib/auth/audit';
 import type { Role } from '@prisma/client';
@@ -28,6 +29,7 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
     requireRole('SUPER_ADMIN')(authed);
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ApiError, handleError } from '@/lib/auth/errors';
 import { requireBranchAccess } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { prisma } from '@/lib/auth/prisma';
 import { requestContext } from '@/lib/auth/rate-limit';
 import { auditLog } from '@/lib/auth/audit';
@@ -23,6 +24,7 @@ export async function GET(
 ) {
   try {
     const { branchId } = await params;
+    assertSameOrigin(req);
     const authed = await requireBranchAccess(req, branchId);
 
     const items = await prisma.menuItem.findMany({
@@ -54,6 +56,7 @@ export async function PUT(
 ) {
   try {
     const { branchId } = await params;
+    assertSameOrigin(req);
     const authed = await requireBranchAccess(req, branchId);
 
     const input = overrideUpsertSchema.parse(await req.json());
@@ -93,6 +96,7 @@ export async function DELETE(
 ) {
   try {
     const { branchId } = await params;
+    assertSameOrigin(req);
     const authed = await requireBranchAccess(req, branchId);
 
     const input = overrideDeleteSchema.parse(await req.json());

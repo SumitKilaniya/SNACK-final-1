@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth/guard';
+import { assertSameOrigin } from '@/lib/auth/csrf';
 import { ApiError, handleError } from '@/lib/auth/errors';
 import { runCheckout } from '@/lib/checkout';
 import { checkoutSchema } from '@/lib/cart-schemas';
@@ -27,6 +28,7 @@ export const runtime = 'nodejs';
  */
 export async function POST(req: NextRequest) {
   try {
+    assertSameOrigin(req);
     const authed = await requireAuth(req);
 
     // Phase 9: rate-limit order placement — per-IP burst and per-user cap so a
