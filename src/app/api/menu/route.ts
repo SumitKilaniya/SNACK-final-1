@@ -5,6 +5,9 @@ import { menuItems } from '@/lib/menu-data';
 
 export const runtime = 'nodejs';
 
+/** Cache menu responses for 5 minutes. Checkout always recomputes from DB. */
+export const revalidate = 300;
+
 const FALLBACK_BRANCH = {
   id: 'br_btm_layout',
   name: 'BTM Layout',
