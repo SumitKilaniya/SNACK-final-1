@@ -1,4 +1,4 @@
-# Snack-Pod — Deployment & Monitoring Guide (Phase 10)
+# Snack-Pod — Deployment & Monitoring Guide (Phase 14)
 
 This document is the operational manual for taking the app live. Everything
 referenced here exists in the repo; the only steps you must do yourself are the
@@ -139,17 +139,26 @@ goes through `freebuff-deploy env set '{"KEY":"value"}'`.
 
 ## 9. Rollback plan
 
-- **Freebuff hosting:** redeploy a previous good build — the platform keeps
-  prior deployments.
-- **Docker/GHCR:** images are tagged with both `latest` and the commit SHA.
-  Roll back by pinning the last known-good SHA:
-  `docker run ghcr.io/<owner>/<repo>:<previous-sha>`. Always migrate the
-  database **forward** before deploying new code that needs the new schema, and
-  never roll back a schema migration (roll back code only).
+See `docs/ROLLBACK.md` for the full rollback procedure. Summary:
+
+- **Freebuff hosting:** redeploy a previous good build from the Deployments tab.
+- **Docker/GHCR:** pin the last known-good SHA: `docker run ghcr.io/<owner>/<repo>:<previous-sha>`.
+- **Database:** all Phase 1–14 migrations are additive-only (new columns with
+  defaults, new indexes, new tables). Roll back code freely; the old code
+  ignores unknown columns. Never roll back the database schema itself.
 
 ---
 
-## 10. Fresh-deploy checklist (Phase 10 checkpoint)
+## 10. Staging deploy path
+
+1. Push to `main` — GitHub Actions runs typecheck, unit tests, build, and
+   Playwright e2e tests.
+2. Freebuff auto-deploys to staging on merge to `main`.
+3. Set staging env vars: `freebuff-deploy env set '{"DATABASE_URL":"...", ...}'`
+4. Verify: `GET /api/health` → `200 {ok:true, db:'up'}`
+5. Run the load test: `BASE_URL=https://staging.snackpod.in TOKEN=<jwt> node scripts/load-test-checkout.js`
+
+## 11. Fresh-deploy checklist (Phase 14 checkpoint)
 
 1. `docker compose up --build` locally (app + Postgres + Redis) — or deploy to
    Freebuff hosting.
@@ -162,3 +171,6 @@ goes through `freebuff-deploy env set '{"KEY":"value"}'`.
 6. Trigger a deliberate 5xx once and confirm it appears in Sentry.
 7. Confirm UptimeRobot is polling `/api/health` and that a stopped app pages
    you.
+8. Confirm Sentry receives a test error (trigger a deliberate 5xx).
+9. Run the Playwright e2e test against staging.
+10. Run the load test script against staging and verify p99 < 2s.
