@@ -4,6 +4,9 @@ import { parsePincodes } from '@/lib/catalog';
 
 export const runtime = 'nodejs';
 
+/** Cache active branch list for 5 minutes — branches change rarely. */
+export const revalidate = 300;
+
 const FALLBACK_BRANCHES = [
   {
     id: 'br_btm_layout',

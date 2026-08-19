@@ -312,6 +312,8 @@ model Order {
     @@index([branchId, status])
     @@index([userId, createdAt])
     @@index([couponId])
+    @@index([createdAt])
+    @@index([paymentStatus])
     @@map("orders")
 }
 
