@@ -1,0 +1,579 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Espresso & cream theme — one dominant neutral, one accent, one warm tint.
+       Tokens are RGB channel triplets so Tailwind's <alpha-value> opacity
+       modifiers (bg-primary/10, shadow-primary/30, …) compile correctly.
+       Contrast (WCAG AA): espresso 36 22 16 on cream ≈ 17:1, muted-brown
+       110 88 73 on white ≈ 6.6:1, terracotta 194 65 12 with white ≈ 5.2:1. */
+  --background: 251 247 241;
+  --foreground: 36 22 16;
+  --primary: 194 65 12;
+  --primary-foreground: 255 255 255;
+  --secondary: 242 236 226;
+  --secondary-foreground: 36 22 16;
+  --accent: 168 58 14;
+  --accent-foreground: 255 255 255;
+  --muted: 239 231 219;
+  --muted-foreground: 110 88 73;
+  --card: 255 255 255;
+  --card-foreground: 36 22 16;
+  --border: 233 223 209;
+  --input: 242 236 226;
+  --ring: 194 65 12;
+  --radius: 0.75rem;
+  --font-sans: var(--font-plus-jakarta-sans), sans-serif;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    border-color: rgb(var(--border));
+  }
+
+  body {
+    background-color: rgb(var(--background));
+    color: rgb(var(--foreground));
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    margin: 0;
+  }
+}
+
+@layer utilities {
+  .text-hero-xl {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .text-section-title {
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .card-hover {
+    transition:
+      transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+      box-shadow 0.35s ease;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 16px 40px rgba(194, 65, 12, 0.14);
+  }
+
+  .btn-spring {
+    transition:
+      transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+      background-color 0.2s ease;
+  }
+
+  .btn-spring:hover {
+    transform: scale(1.05);
+  }
+
+  .btn-spring:active {
+    transform: scale(0.97);
+  }
+
+  .img-grayscale-hover img {
+    filter: grayscale(20%);
+    transition:
+      filter 0.5s ease,
+      transform 0.5s ease;
+  }
+
+  .img-grayscale-hover:hover img {
+    filter: grayscale(0%);
+    transform: scale(1.04);
+  }
+
+  .badge-veg {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid #22c55e;
+    border-radius: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .badge-veg::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: #22c55e;
+    border-radius: 50%;
+  }
+
+  .badge-nonveg {
+    width: 14px;
+    height: 14px;
+    border: 1.5px solid #c2410c;
+    border-radius: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .badge-nonveg::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: #c2410c;
+    border-radius: 50%;
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .star-filled {
+    color: #f59e0b;
+    fill: #f59e0b;
+  }
+
+  .star-empty {
+    color: #d1d5db;
+    fill: #d1d5db;
+  }
+
+  .promo-gradient {
+    background: linear-gradient(135deg, #2c1810 0%, #4a2010 40%, #6b3020 100%);
+  }
+
+  .category-pill-active {
+    background-color: rgb(var(--primary));
+    color: rgb(var(--primary-foreground));
+  }
+
+  .category-pill-inactive {
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .category-pill-inactive:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  /* Scroll reveal pop animation */
+  .scroll-pop {
+    opacity: 0;
+    transform: translateY(32px) scale(0.96);
+    transition:
+      opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .scroll-pop.popped {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .scroll-reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Cart badge bounce when the item count changes */
+  .cart-bounce {
+    animation: cartBounce 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Toast entrance */
+  .toast-in {
+    animation: toastIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Skeleton shimmer for loading states */
+  .skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #fafafa 37%, #f0f0f0 63%);
+    background-size: 400px 100%;
+    animation: shimmer 1.4s ease infinite;
+  }
+
+  /* Flash highlight for the dish targeted by the header search autocomplete */
+  .dish-highlight {
+    animation: dishFlash 1.4s ease-out 2;
+  }
+
+  /* This Tailwind build ships without backface-visibility utilities */
+  .backface-hidden {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  /* Hero dish — the food photo stays static and gently tilts in place.
+       Small-amplitude 3D oscillation (never a full spin), so it reads as a
+       dish catching light, not a flat card rotating. */
+  .hero-dish-tilt {
+    transform-style: preserve-3d;
+    animation: heroTilt 9s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  /* Soft light sweep that glides across the dish — fakes a rotating glossy surface */
+  .hero-dish-glare {
+    background: radial-gradient(
+      ellipse 40% 60% at 50% 45%,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(255, 255, 255, 0.16) 38%,
+      rgba(255, 255, 255, 0) 65%
+    );
+    mix-blend-mode: overlay;
+    animation: heroGlareSweep 9s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  /* Elliptical ground shadow that drifts subtly in sync with the tilt */
+  .hero-dish-shadow {
+    animation: heroShadowShift 9s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  /* Special-offer code chip pop when a riddle is solved */
+  .offer-unlocked {
+    animation: offerPop 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Continuous reviews marquee — the track holds the list twice and slides
+       -50%, so the loop has no visible jump. Hovering the wrapper pauses it. */
+  .marquee-track {
+    animation: marquee 45s linear infinite;
+    will-change: transform;
+  }
+
+  .marquee-pause:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track,
+    .hero-dish-tilt,
+    .hero-dish-glare,
+    .hero-dish-shadow,
+    .hero-ring {
+      animation: none !important;
+    }
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cartBounce {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.6);
+  }
+
+  70% {
+    transform: scale(0.9);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+@keyframes dishFlash {
+  0% {
+    box-shadow: 0 0 0 0 rgba(194, 65, 12, 0.5);
+  }
+
+  70% {
+    box-shadow: 0 0 0 14px rgba(194, 65, 12, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(194, 65, 12, 0);
+  }
+}
+
+@keyframes heroTilt {
+  0%,
+  100% {
+    transform: rotateY(-8deg) rotateX(2.5deg);
+  }
+
+  50% {
+    transform: rotateY(8deg) rotateX(-2.5deg);
+  }
+}
+
+@keyframes heroGlareSweep {
+  0%,
+  100% {
+    transform: translateX(-28%);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: translateX(28%);
+    opacity: 0.9;
+  }
+}
+
+@keyframes heroShadowShift {
+  0%,
+  100% {
+    transform: translateX(-6%) scaleX(1.06);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: translateX(6%) scaleX(0.94);
+    opacity: 0.55;
+  }
+}
+
+@keyframes offerPop {
+  0% {
+    transform: scale(0.9);
+    box-shadow: 0 0 0 0 rgba(217, 164, 62, 0.6);
+  }
+
+  60% {
+    transform: scale(1.04);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 24px rgba(217, 164, 62, 0.25);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* ── Order-placed celebration ─────────────────────────────────────────── */
+
+@keyframes orderPopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.82) translateY(28px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.03) translateY(-3px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes orderCheckDraw {
+  from {
+    stroke-dashoffset: 60;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes orderHalo {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+@keyframes orderConfetti {
+  0% {
+    transform: translateY(-12vh) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(720deg) scale(0.6);
+    opacity: 0.4;
+  }
+}
+
+@keyframes orderFloat {
+  0% {
+    transform: translateY(6vh) scale(0.7) rotate(-6deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.85;
+  }
+  85% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-58vh) scale(1.05) rotate(8deg);
+    opacity: 0;
+  }
+}
+
+.order-pop-in {
+  animation: orderPopIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.order-check-draw {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: orderCheckDraw 0.55s 0.3s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.order-halo {
+  animation: orderHalo 1.6s ease-out infinite;
+}
+
+.order-confetti-piece {
+  animation: orderConfetti linear infinite;
+}
+
+.order-float-emoji {
+  animation: orderFloat ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .order-pop-in,
+  .order-check-draw,
+  .order-halo,
+  .order-confetti-piece,
+  .order-float-emoji {
+    animation: none !important;
+  }
+}

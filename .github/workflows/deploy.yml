@@ -1,0 +1,56 @@
+# Deploys on every merge to `main`.
+#
+# Two paths:
+#  1. Self-host / any Docker host (Render, Railway, VPS, …): this workflow
+#     builds the image and pushes it to GitHub Container Registry. Point your
+#     host at `ghcr.io/<owner>/<repo>:latest` and set a deploy webhook secret
+#     to have it redeploy automatically.
+#  2. Freebuff-managed hosting: the platform deploys from the Deploy button
+#     (framework defaults, `next build`), so no extra step is needed here.
+#
+# Required repo secrets: none for the image push (uses the built-in GITHUB_TOKEN).
+# Optional: DEPLOY_WEBHOOK_URL — set it to trigger a host redeploy after push.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-push:
+    name: Build & push image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Notify hosting webhook
+        if: env.DEPLOY_WEBHOOK_URL != ''
+        env:
+          DEPLOY_WEBHOOK_URL: ${{ secrets.DEPLOY_WEBHOOK_URL }}
+        run: curl -fsS -X POST "$DEPLOY_WEBHOOK_URL" || echo "::warning::deploy webhook failed"

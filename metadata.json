@@ -1,0 +1,8 @@
+{
+  "name": "Snack-Pod",
+  "description": "Order burgers, snacks, combos and meals with fast delivery across Bangalore outlets.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

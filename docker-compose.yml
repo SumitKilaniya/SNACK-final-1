@@ -1,0 +1,80 @@
+# Snack-Pod local production-like stack: app + Postgres + Redis.
+#
+# Postgres is the datasource everywhere (see prisma/schema.prisma); migrations
+# live in prisma/migrations and are applied by scripts/docker-entrypoint.sh on
+# container start (`prisma migrate deploy`, falling back to a schema sync).
+#
+#   docker compose up --build
+#   open http://localhost:3000   (health: http://localhost:3000/api/health)
+#
+# All secrets below are local-only placeholders — never reuse in production.
+# Empty vars are intentionally blank: the app treats them as "not configured"
+# and degrades gracefully (see src/lib/auth/*, src/lib/payments/*).
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: snackpod
+      POSTGRES_PASSWORD: snackpod
+      POSTGRES_DB: snackpod
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U snackpod -d snackpod"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    # Auto-restart if the app crashes after boot, so a dead container is never
+    # left silently refusing connections; failures stay visible in
+    # `docker compose logs -f`.
+    restart: unless-stopped
+    environment:
+      # Core / required
+      DATABASE_URL: postgresql://snackpod:snackpod@db:5432/snackpod
+      APP_ORIGIN: http://localhost:3000
+      JWT_ACCESS_SECRET: change-me-access-secret
+      JWT_RESET_SECRET: change-me-reset-secret
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+      # Google OAuth (blank until configured)
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: ""
+      GOOGLE_CLIENT_ID: ""
+      GOOGLE_CLIENT_SECRET: ""
+      # Stripe payments (blank until configured)
+      STRIPE_SECRET_KEY: ""
+      STRIPE_WEBHOOK_SECRET: ""
+      STRIPE_CURRENCY: ""
+      # Email (console provider is the default when RESEND_API_KEY is blank)
+      RESEND_API_KEY: ""
+      EMAIL_PROVIDER: ""
+      RESEND_FROM: ""
+      # SMS/OTP (console provider is the default when Twilio vars are blank)
+      TWILIO_ACCOUNT_SID: ""
+      TWILIO_AUTH_TOKEN: ""
+      TWILIO_PHONE_NUMBER: ""
+      TWILIO_FROM: ""
+      SMS_PROVIDER: ""
+      # Monitoring
+      SENTRY_DSN: ""
+      # Optional
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  pgdata:
