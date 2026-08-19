@@ -6,13 +6,28 @@ yet. Add the keys (Freebuff Keys/API-keys tab, or production env vars) and the
 feature lights up — no code changes needed.
 
 **How to use:** tick a box when the key(s) are added and the feature is
-verified working. Keep this list accurate and complete after every phase —
-it is the deliverable behind "when all phases are done, I should only need to
-add keys". The exact var names for each feature are listed inline below (and
-in the env-var table in `DEPLOYMENT.md`); the boot-time validation that warns
-about these lives in `src/lib/env.ts`.
+verified working. This is the single source of truth for "what to add before
+this is fully live." The exact var names for each feature are listed inline
+below; the boot-time validation that warns about these lives in
+`src/lib/env.ts`.
+
+**Last updated:** Phase 14 (launch readiness audit)
 
 ---
+
+## Required for basic operation
+
+- [ ] **Database (Postgres)** — needs `DATABASE_URL`. Currently: the seed
+      script creates a branch, menu items, and admin accounts. Without this,
+      the app cannot start (the Docker entrypoint exits non-zero). Use a
+      managed Postgres (Neon recommended — see DEPLOYMENT.md).
+
+- [ ] **JWT secrets** — needs `JWT_ACCESS_SECRET` (≥32 random chars) and
+      `JWT_RESET_SECRET` (≥32 random chars). Without these, login and
+      registration fail immediately.
+
+- [ ] **App origin** — needs `APP_ORIGIN` (e.g. `https://app.snackpod.in`).
+      Used for CSRF origin checking, email links, and Stripe callback URLs.
 
 ## Auth
 
@@ -30,7 +45,7 @@ about these lives in `src/lib/env.ts`.
 - [ ] **CAPTCHA on login (reCAPTCHA)** — needs `RECAPTCHA_SECRET`. Currently:
       the login route verifies a `captchaToken` when one is sent, but with no
       secret the dev provider accepts any non-empty token, and the client
-      never renders a CAPTCHA widget (deferred to a later phase).
+      never renders a CAPTCHA widget.
 
 ## Payments
 
@@ -38,8 +53,7 @@ about these lives in `src/lib/env.ts`.
       `STRIPE_WEBHOOK_SECRET`. Currently: checkout is Cash-on-Delivery only.
       The Stripe backend (`src/lib/payments/stripe.ts`) and the
       signature-verified webhook route already exist but throw
-      `PAYMENT_NOT_CONFIGURED` until the keys are set. No Stripe UI is wired
-      yet — planned as its own dedicated phase.
+      `PAYMENT_NOT_CONFIGURED` until the keys are set.
 
 ## Notifications / observability
 
@@ -50,8 +64,10 @@ about these lives in `src/lib/env.ts`.
 
 - [ ] **Error monitoring (Sentry)** — needs `SENTRY_DSN`. Currently:
       `captureError` logs exceptions to the console instead of reporting them
-      to Sentry (integration is wired at the API error choke point, inert
-      until set).
+      to Sentry. **The integration is fully wired:** `src/lib/monitoring/sentry.ts`
+      lazy-initializes on first error, and `src/lib/auth/errors.ts` calls
+      `captureError` for every 5xx. Set the DSN and it starts reporting
+      immediately — no code changes needed.
 
 ## Infrastructure
 
@@ -60,7 +76,7 @@ about these lives in `src/lib/env.ts`.
       set `REDIS_URL` so limits are shared across replicas/serverless
       instances.
 
-## Media / object storage (Phase 8)
+## Media / object storage
 
 - [ ] **Image upload to cloud storage** — needs `STORAGE_BUCKET`,
       `STORAGE_REGION`, `STORAGE_ACCESS_KEY_ID`, `STORAGE_SECRET_ACCESS_KEY`,
@@ -72,12 +88,27 @@ about these lives in `src/lib/env.ts`.
       **Bucket setup:** disable public listing on the bucket — only individual
       object URLs should be reachable (presigned URLs handle the rest).
 
-## Reviews & Wishlist (Phase 6)
+## Reviews & Wishlist
 
 No external keys required. Reviews and wishlist are fully functional with the
 existing database — no third-party service dependency.
 
 ---
 
-_Add new entries here as later phases introduce more key-gated features
-(e.g. payment refunds, SMS marketing, delivery-partner integrations)._
+## Environment variable summary
+
+| Feature | Required vars | Status without keys |
+|---------|--------------|-------------------|
+| Core app | `DATABASE_URL`, `JWT_ACCESS_SECRET`, `JWT_RESET_SECRET`, `APP_ORIGIN` | App won't start / login fails |
+| Google login | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Button hidden, 503 if called |
+| Phone OTP | `SMS_PROVIDER`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER` | Dev mode (code on screen) |
+| CAPTCHA | `RECAPTCHA_SECRET` | Dev mode (any token accepted) |
+| Stripe | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | COD only, 503 if card used |
+| Email | `EMAIL_PROVIDER`, `RESEND_API_KEY` | Console logging only |
+| Sentry | `SENTRY_DSN` | Console logging only |
+| Redis | `REDIS_URL` | In-process store (single instance) |
+| Storage | `STORAGE_BUCKET`, `STORAGE_REGION`, `STORAGE_ACCESS_KEY_ID`, `STORAGE_SECRET_ACCESS_KEY`, `STORAGE_PUBLIC_URL_BASE` | Paste-URL fallback, 503 |
+
+---
+
+_Add new entries here as later phases introduce more key-gated features._
