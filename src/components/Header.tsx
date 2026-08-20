@@ -146,6 +146,17 @@ export default function Header() {
                       </div>
 
                       <div className="py-1">
+                        {(user?.role === 'SUPER_ADMIN' || user?.role === 'BRANCH_ADMIN') && (
+                          <Link
+                            href="/admin"
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-amber-900 bg-amber-50 hover:bg-amber-100 transition-colors border-b border-amber-100/80"
+                          >
+                            <Icon name="Cog6ToothIcon" size={16} className="text-amber-600" />
+                            <span>Admin Portal ⚡</span>
+                          </Link>
+                        )}
+
                         <Link
                           href="/account"
                           onClick={() => setUserMenuOpen(false)}

@@ -37,7 +37,7 @@ if (!process.env.APP_ORIGIN) {
   process.env.APP_ORIGIN = 'http://localhost:3000';
 }
 if (!process.env.DATABASE_URL) {
-  process.env.DATABASE_URL = 'postgresql://snackpod:snackpod@localhost:5432/snackpod';
+  process.env.DATABASE_URL = 'file:./dev.db';
 }
 
 // Optional — a missing var only disables the related feature.

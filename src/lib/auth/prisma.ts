@@ -6,7 +6,7 @@ import { PrismaClient } from '@prisma/client';
 // docker-compose.yml) — production always provides a real DATABASE_URL, which
 // is never overridden here.
 if (!process.env.DATABASE_URL && process.env.NODE_ENV !== 'production') {
-  process.env.DATABASE_URL = 'postgresql://snackpod:snackpod@localhost:5432/snackpod';
+  process.env.DATABASE_URL = 'file:./dev.db';
 }
 
 // Prevent exhausting the SQLite/connection pool during Next.js dev hot-reload.

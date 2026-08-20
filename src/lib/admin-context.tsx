@@ -50,8 +50,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
     async function verify() {
       if (!getAdminToken()) {
-        setState('signedOut');
-        return;
+        const u = await adminRefresh().catch(() => null);
+        if (!u) {
+          if (!cancelled) setState('signedOut');
+          return;
+        }
       }
       try {
         const data = await adminApi<DashboardData>('/api/admin/dashboard');

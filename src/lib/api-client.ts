@@ -14,6 +14,8 @@
  *   retries exactly once after a token rotation on 401.
  */
 
+import { setAdminToken, setAdminUser, clearAdminSession } from './admin-api';
+
 export type UserRole = 'CUSTOMER' | 'BRANCH_ADMIN' | 'SUPER_ADMIN';
 
 /** Mirrors SafeUser from src/lib/auth/session.ts (the backend's shape). */
@@ -142,6 +144,10 @@ export async function refreshSession(): Promise<SessionUser | null> {
   try {
     const data = await post<AuthSession>('/api/auth/refresh');
     accessToken = data.accessToken;
+    if (data.user && (data.user.role === 'SUPER_ADMIN' || data.user.role === 'BRANCH_ADMIN')) {
+      setAdminToken(data.accessToken);
+      setAdminUser(data.user as never);
+    }
     return data.user;
   } catch {
     accessToken = null;
@@ -190,6 +196,10 @@ export async function authenticatedFetch<T>(path: string, init: RequestInit = {}
 export async function login(input: LoginInput): Promise<AuthSession> {
   const data = await post<AuthSession>('/api/auth/login', input);
   accessToken = data.accessToken;
+  if (data.user && (data.user.role === 'SUPER_ADMIN' || data.user.role === 'BRANCH_ADMIN')) {
+    setAdminToken(data.accessToken);
+    setAdminUser(data.user as never);
+  }
   return data;
 }
 
@@ -206,6 +216,7 @@ export async function logout(): Promise<void> {
     await post<{ ok: boolean }>('/api/auth/logout');
   } finally {
     accessToken = null;
+    clearAdminSession();
   }
 }
 

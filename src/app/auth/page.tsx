@@ -200,9 +200,15 @@ function AuthContent() {
     setIsLoading(true);
 
     try {
-      await login(signInEmail.trim(), signInPassword);
+      const loggedUser = await login(signInEmail.trim(), signInPassword);
+      const targetUrl =
+        returnUrl !== '/'
+          ? returnUrl
+          : loggedUser.role === 'SUPER_ADMIN' || loggedUser.role === 'BRANCH_ADMIN'
+          ? '/admin'
+          : '/';
       setSuccessMessage('Successfully signed in! Welcome back to Snack-Pod 🍔');
-      setTimeout(() => router.push(returnUrl), 600);
+      setTimeout(() => router.push(targetUrl), 600);
     } catch (err) {
       // The backend asks for a CAPTCHA after repeated failures; there is no
       // CAPTCHA widget yet, so surface a clear message instead of silently
