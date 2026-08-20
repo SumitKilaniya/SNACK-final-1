@@ -35,22 +35,22 @@ export default function DealBanner() {
   const deal = deals?.[active];
 
   return (
-    <section className="relative overflow-hidden rounded-xl promo-gradient min-h-[220px] flex items-center">
+    <section className="relative overflow-hidden rounded-2xl promo-gradient min-h-[220px] flex items-center shadow-[0_20px_48px_rgba(0,0,0,0.15)]">
       <div className="flex-1 p-8 sm:p-12 z-10 max-w-lg">
-        <span className="text-xs font-bold text-primary tracking-widest uppercase mb-2 block">
+        <span className="text-xs font-bold text-primary uppercase mb-2 block" style={{ letterSpacing: '0.08em' }}>
           {deal?.label}
         </span>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight mb-3">
+        <h2 className="text-2xl sm:text-3xl font-display font-bold text-white leading-tight mb-3">
           {deal?.title}
         </h2>
-        <p className="text-sm text-white/70 mb-5">{deal?.description}</p>
+        <p className="text-sm text-white/60 mb-5" style={{ letterSpacing: '0.02em' }}>{deal?.description}</p>
         <div className="flex items-baseline gap-3 mb-6">
           <span className="text-2xl font-extrabold text-white">₹{deal?.salePrice}.00</span>
           <span className="text-base text-white/50 line-through">₹{deal?.originalPrice}.00</span>
         </div>
         <Link
           href="/menu"
-          className="inline-block px-6 py-2.5 bg-primary text-primary-foreground font-bold text-sm rounded hover:bg-accent transition-colors btn-spring"
+          className="inline-block px-6 py-2.5 bg-primary text-primary-foreground font-bold text-sm btn-pill hover:bg-accent transition-colors btn-spring"
         >
           {deal?.cta}
         </Link>
@@ -65,7 +65,7 @@ export default function DealBanner() {
           sizes="40vw"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-r from-[#2C1810] via-[#2C1810]/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1A1615] via-[#1A1615]/60 to-transparent" />
       </div>
       {/* Carousel dots */}
       <div className="absolute bottom-4 right-4 flex gap-2">

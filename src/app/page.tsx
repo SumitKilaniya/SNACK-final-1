@@ -22,7 +22,7 @@ export default function HomePage() {
         <HeroSection />
         <PolicyStrip />
         <PromoBanners />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 space-y-16">
           <CategoryBrowser />
           <TrendingDishes />
           <DealBanner />

@@ -102,7 +102,7 @@ function AddControl({
         <button
           onClick={onAdd}
           aria-label={`Add ${dish.name} to cart`}
-          className="w-9 h-9 bg-primary text-white rounded-full flex items-center justify-center hover:bg-accent transition-colors btn-spring shadow-lg"
+          className="w-9 h-9 bg-primary text-white rounded-full flex items-center justify-center hover:bg-accent transition-colors btn-spring shadow-[0_4px_12px_rgba(168,62,27,0.25)]"
         >
           <Icon name="ShoppingCartIcon" size={16} />
         </button>
@@ -110,8 +110,7 @@ function AddControl({
     }
     return (
       <button
-        onClick={onAdd}
-        className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground font-bold text-sm rounded-full hover:bg-accent transition-colors btn-spring"
+        onClick={onAdd}          className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground font-bold text-sm btn-pill hover:bg-accent transition-colors btn-spring"
       >
         <Icon name="PlusIcon" size={14} />
         Add
@@ -173,7 +172,7 @@ const DishCardInner = memo(function DishCardInner({
     return (
       <div
         id={id}
-        className={`bg-white rounded-2xl border border-border overflow-hidden group card-hover flex flex-col isolate ${
+        className={`bg-white rounded-2xl border border-[rgba(0,0,0,0.06)] overflow-hidden group card-hover flex flex-col isolate shadow-[0_14px_40px_rgba(0,0,0,0.04)] ${
           isOutOfStock ? 'opacity-85' : ''
         } ${className}`}
       >
@@ -232,7 +231,7 @@ const DishCardInner = memo(function DishCardInner({
     return (
       <div
         id={id}
-        className={`flex-none w-44 sm:w-52 bg-white rounded-2xl border border-border overflow-hidden group card-hover shadow-sm flex flex-col isolate ${
+        className={`flex-none w-44 sm:w-52 bg-white rounded-2xl border border-[rgba(0,0,0,0.06)] overflow-hidden group card-hover shadow-[0_14px_40px_rgba(0,0,0,0.04)] flex flex-col isolate ${
           isOutOfStock ? 'opacity-85' : ''
         } ${className}`}
       >
@@ -302,9 +301,9 @@ const DishCardInner = memo(function DishCardInner({
   return (
     <div
       id={id}
-      className={`flex items-center gap-4 bg-white rounded-2xl border border-border p-4 hover:border-primary/30 hover:shadow-md transition-all duration-300 group isolate ${
-        isOutOfStock ? 'opacity-85' : ''
-      } ${className}`}
+    className={`flex items-center gap-4 bg-white rounded-2xl border border-[rgba(0,0,0,0.06)] p-4 hover:border-primary/20 hover:shadow-[0_16px_40px_rgba(0,0,0,0.06)] transition-all duration-300 group isolate shadow-[0_14px_40px_rgba(0,0,0,0.04)] ${
+      isOutOfStock ? 'opacity-85' : ''
+    } ${className}`}
     >
       <div className="relative z-0 w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-secondary">
         <AppImage

@@ -4,19 +4,19 @@ import Icon from '@/components/ui/AppIcon';
 
 export default function Footer() {
   return (
-    <footer className="bg-foreground text-white">
+    <footer className="bg-[#1A1615] text-white">
       {/* Top CTA Strip */}
-      <div className="bg-gradient-to-r from-primary to-accent py-10 px-6">
+      <div className="bg-primary py-10 px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div>
-            <h3 className="text-2xl font-black text-white mb-1">Hungry? We got you. 🍔</h3>
-            <p className="text-white/80 text-sm">
+            <h3 className="text-2xl font-display font-bold text-white mb-1">Hungry? We got you.</h3>
+            <p className="text-white/70 text-sm tracking-wide">
               Order now and get free delivery on your first order.
             </p>
           </div>
           <Link
             href="/menu"
-            className="shrink-0 px-8 py-3.5 bg-white text-primary font-bold rounded-2xl hover:bg-white/90 transition-colors shadow-lg text-sm"
+            className="shrink-0 btn-pill px-8 py-3.5 bg-white text-primary font-bold hover:bg-white/90 transition-colors shadow-lg text-sm"
           >
             Order Now →
           </Link>
@@ -29,14 +29,14 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+              <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
                 <span className="text-white font-black text-lg">S</span>
               </div>
-              <span className="font-black text-xl text-white">
+              <span className="font-display font-bold text-xl text-white">
                 Snack<span className="text-primary">-Pod</span>
               </span>
             </Link>
-            <p className="text-sm text-white/50 leading-relaxed mb-5">
+            <p className="text-sm text-white/40 leading-relaxed mb-5 tracking-wide">
               Fresh, bold flavors for the next generation. Delivery, pickup, or dine-in — we make
               every bite count.
             </p>
@@ -51,7 +51,7 @@ export default function Footer() {
                   key={s.label}
                   href="#"
                   aria-label={s.label}
-                  className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-white/60 hover:bg-primary hover:text-white transition-all duration-200"
+                  className="w-9 h-9 rounded-xl bg-white/[0.06] flex items-center justify-center text-white/40 hover:bg-primary hover:text-white transition-all duration-200"
                 >
                   <Icon name={s.icon as 'HeartIcon'} size={16} />
                 </a>
@@ -61,7 +61,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-widest mb-5">
+            <h4 className="text-[11px] font-bold text-white/50 uppercase tracking-[0.2em] mb-5">
               Quick Links
             </h4>
             <ul className="flex flex-col gap-3">
@@ -77,7 +77,7 @@ export default function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-white/50 hover:text-white transition-colors"
+                    className="text-sm text-white/40 hover:text-white transition-colors tracking-wide"
                   >
                     {link.label}
                   </Link>
@@ -88,7 +88,7 @@ export default function Footer() {
 
           {/* Legal */}
           <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-widest mb-5">Legal</h4>
+            <h4 className="text-[11px] font-bold text-white/50 uppercase tracking-[0.2em] mb-5">Legal</h4>
             <ul className="flex flex-col gap-3">
               {[
                 { label: 'Privacy Policy', href: '/privacy' },
@@ -100,7 +100,7 @@ export default function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="text-sm text-white/50 hover:text-white transition-colors"
+                    className="text-sm text-white/40 hover:text-white transition-colors tracking-wide"
                   >
                     {link.label}
                   </Link>
@@ -111,17 +111,17 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-sm font-bold text-white uppercase tracking-widest mb-5">
+            <h4 className="text-[11px] font-bold text-white/50 uppercase tracking-[0.2em] mb-5">
               Contact Us
             </h4>
             <ul className="flex flex-col gap-4">
               <li className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-8 h-8 rounded-lg bg-white/[0.06] flex items-center justify-center shrink-0 mt-0.5">
                   <Icon name="MapPinIcon" size={14} />
                 </div>
                 <div>
-                  <p className="text-sm text-white/80 font-medium">Koramangala, Bangalore</p>
-                  <p className="text-xs text-white/40">Karnataka, India 560034</p>
+                  <p className="text-sm text-white/70 font-medium tracking-wide">Koramangala, Bangalore</p>
+                  <p className="text-xs text-white/35">Karnataka, India 560034</p>
                 </div>
               </li>
               <li className="flex items-center gap-3">
@@ -130,7 +130,7 @@ export default function Footer() {
                 </div>
                 <a
                   href="tel:+918001234567"
-                  className="text-sm text-white/70 hover:text-white transition-colors"
+                  className="text-sm text-white/50 hover:text-white transition-colors tracking-wide"
                 >
                   +91 800 123 4567
                 </a>
@@ -141,7 +141,7 @@ export default function Footer() {
                 </div>
                 <a
                   href="mailto:hello@snackpod.in"
-                  className="text-sm text-white/70 hover:text-white transition-colors"
+                  className="text-sm text-white/50 hover:text-white transition-colors tracking-wide"
                 >
                   hello@snackpod.in
                 </a>
@@ -149,9 +149,9 @@ export default function Footer() {
             </ul>
 
             {/* App Download hint */}
-            <div className="mt-6 p-3 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-xs text-white/50 mb-1">App coming soon 🚀</p>
-              <p className="text-xs font-semibold text-white/80">iOS & Android</p>
+            <div className="mt-6 p-3 rounded-xl bg-white/[0.04] border border-white/[0.08]">
+              <p className="text-[10px] text-white/35 mb-1 tracking-widest uppercase">App coming soon</p>
+              <p className="text-xs font-semibold text-white/60">iOS & Android</p>
             </div>
           </div>
         </div>
@@ -160,12 +160,12 @@ export default function Footer() {
       {/* Bottom Bar */}
       <div className="border-t border-white/10 py-5 px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-white/30">
-            © 2026 Snack-Pod. All rights reserved. Made with ❤️ in Bangalore.
+          <p className="text-[11px] text-white/25 tracking-wide">
+            © 2026 Snack-Pod. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
-            <span className="text-xs text-white/30">FSSAI Lic: 10020042000123</span>
-            <span className="text-xs text-white/30">GST: 29AABCU9603R1ZX</span>
+            <span className="text-[10px] text-white/25 tracking-widest uppercase">FSSAI Lic: 10020042000123</span>
+            <span className="text-[10px] text-white/25 tracking-widest uppercase">GST: 29AABCU9603R1ZX</span>
           </div>
         </div>
       </div>

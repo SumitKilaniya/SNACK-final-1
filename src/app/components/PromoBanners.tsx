@@ -43,7 +43,7 @@ export default function PromoBanners() {
     <section className="max-w-7xl mx-auto px-4 pt-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Left large banner */}
-        <div className="relative overflow-hidden rounded-xl min-h-[280px] sm:min-h-[380px] group img-grayscale-hover">
+        <div className="relative overflow-hidden rounded-2xl min-h-[280px] sm:min-h-[380px] group img-grayscale-hover shadow-[0_16px_40px_rgba(0,0,0,0.08)]">
           <AppImage
             src={banners?.[0]?.image}
             alt={banners?.[0]?.imageAlt}
@@ -54,10 +54,10 @@ export default function PromoBanners() {
 
           <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-transparent" />
           <div className="absolute inset-0 p-8 flex flex-col justify-end">
-            <span className="text-xs font-bold text-primary tracking-widest mb-2 uppercase">
+            <span className="text-xs font-bold text-primary mb-2 uppercase" style={{ letterSpacing: '0.08em' }}>
               {banners?.[0]?.label}
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight mb-4">
+            <h2 className="text-2xl sm:text-3xl font-display font-bold text-white leading-tight mb-4">
               {banners?.[0]?.title}
             </h2>
             <Link
@@ -74,7 +74,7 @@ export default function PromoBanners() {
           {banners?.slice(1)?.map((banner) => (
             <div
               key={banner?.id}
-              className="relative overflow-hidden rounded-xl min-h-[140px] sm:min-h-[180px] group img-grayscale-hover"
+              className="relative overflow-hidden rounded-2xl min-h-[140px] sm:min-h-[180px] group img-grayscale-hover shadow-[0_8px_24px_rgba(0,0,0,0.06)]"
             >
               <AppImage
                 src={banner?.image}
@@ -86,10 +86,10 @@ export default function PromoBanners() {
 
               <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/35 to-transparent" />
               <div className="absolute inset-0 p-6 flex flex-col justify-end">
-                <span className="text-xs font-bold text-primary tracking-widest mb-1 uppercase">
+                <span className="text-xs font-bold text-primary mb-1 uppercase" style={{ letterSpacing: '0.08em' }}>
                   {banner?.label}
                 </span>
-                <h3 className="text-xl font-extrabold text-white leading-tight mb-2">
+                <h3 className="text-xl font-display font-bold text-white leading-tight mb-2">
                   {banner?.title}
                 </h3>
                 <Link

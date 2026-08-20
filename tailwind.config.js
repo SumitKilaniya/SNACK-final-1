@@ -47,6 +47,7 @@ module.exports = {
             },
             fontFamily: {
                 sans: ['var(--font-plus-jakarta-sans)', 'sans-serif'],
+                display: ['var(--font-playfair-display)', 'Georgia', 'serif'],
             },
             animation: {
                 'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards',
@@ -55,6 +56,8 @@ module.exports = {
                 'spin-slow': 'spin 18s linear infinite',
                 'spin-reverse': 'spin 20s linear infinite reverse',
                 'spin-ring': 'spin 30s linear infinite',
+                'hero-spin': 'spin 35s linear infinite',
+                'hero-spin-reverse': 'spin 45s linear infinite reverse',
             },
         },
     },

@@ -3,28 +3,32 @@
 @tailwind utilities;
 
 :root {
-  /* Espresso & cream theme — one dominant neutral, one accent, one warm tint.
-       Tokens are RGB channel triplets so Tailwind's <alpha-value> opacity
-       modifiers (bg-primary/10, shadow-primary/30, …) compile correctly.
-       Contrast (WCAG AA): espresso 36 22 16 on cream ≈ 17:1, muted-brown
-       110 88 73 on white ≈ 6.6:1, terracotta 194 65 12 with white ≈ 5.2:1. */
-  --background: 251 247 241;
-  --foreground: 36 22 16;
-  --primary: 194 65 12;
+  /* ── Option 2: Tuscan Terracotta & Cream Alabaster ──────────────
+       Primary Accent:  #A83E1B (Deep Tuscan Terracotta)
+       Secondary Accent: #D97736 (Burnt Apricot / Amber Glow)
+       Background Base:  #FAF7F2 (Cream Alabaster / Warm Milk)
+       Card Surface:     #FFFFFF (Pure White)
+       Primary Text:     #1A1615 (Espresso Black)
+       Muted Text:       #736B66 (Warm Mineral Taupe)
+  */
+  --background: 250 247 242;
+  --foreground: 26 22 21;
+  --primary: 168 62 27;
   --primary-foreground: 255 255 255;
-  --secondary: 242 236 226;
-  --secondary-foreground: 36 22 16;
-  --accent: 168 58 14;
+  --secondary: 245 242 237;
+  --secondary-foreground: 26 22 21;
+  --accent: 217 119 54;
   --accent-foreground: 255 255 255;
-  --muted: 239 231 219;
-  --muted-foreground: 110 88 73;
+  --muted: 245 242 237;
+  --muted-foreground: 115 107 102;
   --card: 255 255 255;
-  --card-foreground: 36 22 16;
-  --border: 233 223 209;
-  --input: 242 236 226;
-  --ring: 194 65 12;
+  --card-foreground: 26 22 21;
+  --border: 235 230 224;
+  --input: 245 242 237;
+  --ring: 168 62 27;
   --radius: 0.75rem;
   --font-sans: var(--font-plus-jakarta-sans), sans-serif;
+  --font-display: var(--font-playfair-display), Georgia, serif;
 }
 
 @layer base {
@@ -64,6 +68,10 @@
     font-size: clamp(1.25rem, 2.5vw, 1.75rem);
   }
 
+  .font-display {
+    font-family: var(--font-display);
+  }
+
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -87,15 +95,19 @@
     display: none;
   }
 
+  /* ── Glassmorphic card interactions ──────────────────────────── */
   .card-hover {
     transition:
       transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
       box-shadow 0.35s ease;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.04);
   }
 
   .card-hover:hover {
     transform: translateY(-6px) scale(1.01);
-    box-shadow: 0 16px 40px rgba(194, 65, 12, 0.14);
+    box-shadow: 0 20px 48px rgba(168, 62, 27, 0.1);
+    border-color: rgba(168, 62, 27, 0.12);
   }
 
   .btn-spring {
@@ -105,10 +117,24 @@
   }
 
   .btn-spring:hover {
-    transform: scale(1.05);
+    transform: translateY(-2px);
   }
 
   .btn-spring:active {
+    transform: scale(0.97);
+  }
+
+  /* ── Pill button style ─────────────────────────────────────── */
+  .btn-pill {
+    border-radius: 9999px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.2s ease;
+  }
+
+  .btn-pill:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn-pill:active {
     transform: scale(0.97);
   }
 
@@ -177,7 +203,7 @@
   }
 
   .promo-gradient {
-    background: linear-gradient(135deg, #2c1810 0%, #4a2010 40%, #6b3020 100%);
+    background: linear-gradient(135deg, #1A1615 0%, #2C1810 40%, #4A2010 100%);
   }
 
   .category-pill-active {
@@ -243,22 +269,17 @@
     animation: dishFlash 1.4s ease-out 2;
   }
 
-  /* This Tailwind build ships without backface-visibility utilities */
   .backface-hidden {
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
   }
 
-  /* Hero dish — the food photo stays static and gently tilts in place.
-       Small-amplitude 3D oscillation (never a full spin), so it reads as a
-       dish catching light, not a flat card rotating. */
-  .hero-dish-tilt {
-    transform-style: preserve-3d;
-    animation: heroTilt 9s ease-in-out infinite;
+  /* Hero dish — continuous smooth rotation */
+  .hero-dish-spin {
+    animation: heroSpin 35s linear infinite;
     will-change: transform;
   }
 
-  /* Soft light sweep that glides across the dish — fakes a rotating glossy surface */
   .hero-dish-glare {
     background: radial-gradient(
       ellipse 40% 60% at 50% 45%,
@@ -271,19 +292,16 @@
     will-change: transform;
   }
 
-  /* Elliptical ground shadow that drifts subtly in sync with the tilt */
   .hero-dish-shadow {
     animation: heroShadowShift 9s ease-in-out infinite;
     will-change: transform;
   }
 
-  /* Special-offer code chip pop when a riddle is solved */
   .offer-unlocked {
     animation: offerPop 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  /* Continuous reviews marquee — the track holds the list twice and slides
-       -50%, so the loop has no visible jump. Hovering the wrapper pauses it. */
+  /* Continuous reviews marquee */
   .marquee-track {
     animation: marquee 45s linear infinite;
     will-change: transform;
@@ -293,9 +311,18 @@
     animation-play-state: paused;
   }
 
+  /* ── Luxury radial glow behind hero headline ─────────────────── */
+  .hero-radial-glow {
+    background: radial-gradient(
+      circle at 20% 40%,
+      rgba(168, 62, 27, 0.10) 0%,
+      transparent 70%
+    );
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .marquee-track,
-    .hero-dish-tilt,
+    .hero-dish-spin,
     .hero-dish-glare,
     .hero-dish-shadow,
     .hero-ring {
@@ -359,6 +386,15 @@
   }
 }
 
+@keyframes heroSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @keyframes cartBounce {
   0% {
     transform: scale(1);
@@ -401,36 +437,23 @@
 
 @keyframes dishFlash {
   0% {
-    box-shadow: 0 0 0 0 rgba(194, 65, 12, 0.5);
+    box-shadow: 0 0 0 0 rgba(168, 62, 27, 0.5);
   }
 
   70% {
-    box-shadow: 0 0 0 14px rgba(194, 65, 12, 0);
+    box-shadow: 0 0 0 14px rgba(168, 62, 27, 0);
   }
 
   100% {
-    box-shadow: 0 0 0 0 rgba(194, 65, 12, 0);
-  }
-}
-
-@keyframes heroTilt {
-  0%,
-  100% {
-    transform: rotateY(-8deg) rotateX(2.5deg);
-  }
-
-  50% {
-    transform: rotateY(8deg) rotateX(-2.5deg);
+    box-shadow: 0 0 0 0 rgba(168, 62, 27, 0);
   }
 }
 
 @keyframes heroGlareSweep {
-  0%,
-  100% {
+  0%, 100% {
     transform: translateX(-28%);
     opacity: 0.5;
   }
-
   50% {
     transform: translateX(28%);
     opacity: 0.9;
@@ -438,12 +461,10 @@
 }
 
 @keyframes heroShadowShift {
-  0%,
-  100% {
+  0%, 100% {
     transform: translateX(-6%) scaleX(1.06);
     opacity: 0.8;
   }
-
   50% {
     transform: translateX(6%) scaleX(0.94);
     opacity: 0.55;
@@ -453,16 +474,14 @@
 @keyframes offerPop {
   0% {
     transform: scale(0.9);
-    box-shadow: 0 0 0 0 rgba(217, 164, 62, 0.6);
+    box-shadow: 0 0 0 0 rgba(168, 62, 27, 0.6);
   }
-
   60% {
     transform: scale(1.04);
   }
-
   100% {
     transform: scale(1);
-    box-shadow: 0 0 24px rgba(217, 164, 62, 0.25);
+    box-shadow: 0 0 24px rgba(168, 62, 27, 0.25);
   }
 }
 

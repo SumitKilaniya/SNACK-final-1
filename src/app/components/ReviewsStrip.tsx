@@ -37,13 +37,13 @@ export default function ReviewsStrip() {
     <section className="py-10 overflow-hidden bg-background" aria-label="Customer reviews">
       <div className="max-w-7xl mx-auto px-4 mb-4 flex items-baseline justify-between">
         <div className="flex items-baseline gap-2">
-          <h2 className="text-lg sm:text-xl font-extrabold text-foreground">Loved by locals</h2>
-          <span className="text-xs text-muted-foreground">
+          <h2 className="text-lg sm:text-xl font-display font-bold text-foreground">Loved by locals</h2>
+          <span className="text-[11px] text-[#736B66]" style={{ letterSpacing: '0.02em' }}>
             {recentReviews.length > 0 && `${recentReviews.length}+ reviews`}
           </span>
         </div>
         {recentReviews.length > 10 && (
-          <span className="text-xs font-bold text-primary bg-orange-100 px-2.5 py-1 rounded-full">
+          <span className="text-[11px] font-bold text-primary bg-primary/[0.06] px-3 py-1 btn-pill" style={{ letterSpacing: '0.08em' }}>
             {recentReviews.length} community reviews
           </span>
         )}
@@ -57,8 +57,8 @@ export default function ReviewsStrip() {
         <div className="marquee-track flex gap-4 w-max">
           {[...displayReviews, ...displayReviews].map((review, i) => (
             <article
-              key={`${review.id}-${i}`}
-              className="flex-none w-64 sm:w-72 bg-white rounded-xl border border-border shadow-sm px-4 py-3.5"
+            key={`${review.id}-${i}`}
+            className="flex-none w-64 sm:w-72 bg-white rounded-2xl border border-[rgba(0,0,0,0.06)] shadow-[0_14px_40px_rgba(0,0,0,0.04)] px-4 py-3.5"
             >
               <div className="flex items-center justify-between mb-1.5">
                 <p className="text-sm font-bold text-foreground truncate max-w-[140px]">

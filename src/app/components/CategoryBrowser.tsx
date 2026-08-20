@@ -101,15 +101,15 @@ export default function CategoryBrowser() {
 
   return (
     <section ref={sectionRef} className={`scroll-pop ${visible ? 'popped' : ''}`}>
-      <div className="bg-white rounded-2xl border border-border overflow-hidden shadow-sm">
-        <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+      <div className="bg-white rounded-2xl border border-[rgba(0,0,0,0.06)] overflow-hidden shadow-[0_14px_40px_rgba(0,0,0,0.04)]">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[rgba(0,0,0,0.06)]">
           <div>
-            <h2 className="text-2xl font-black text-foreground">Top Flavor Picks</h2>
-            <p className="text-sm text-muted-foreground mt-0.5">Browse by category</p>
+            <h2 className="text-2xl font-display font-bold text-foreground" style={{ letterSpacing: '-0.03em' }}>Top Flavor Picks</h2>
+            <p className="text-sm text-[#736B66] mt-0.5" style={{ letterSpacing: '0.02em' }}>Browse by category</p>
           </div>
           <Link
             href="/menu"
-            className="px-5 py-2 bg-primary text-white text-sm font-bold rounded-full hover:bg-accent transition-colors btn-spring shadow-sm shadow-primary/20"
+            className="px-5 py-2 bg-primary text-white text-sm font-bold btn-pill hover:bg-accent transition-colors btn-spring shadow-sm shadow-primary/20"
           >
             See All
           </Link>
@@ -119,13 +119,13 @@ export default function CategoryBrowser() {
             <Link
               key={cat?.name}
               href={`/menu#${cat.id}`}
-              className={`flex flex-col items-center gap-2.5 py-5 px-3 hover:bg-orange-50 transition-colors group ${
+              className={`flex flex-col items-center gap-2.5 py-5 px-3 hover:bg-[#FAF7F2] transition-colors group ${
                 i < categories?.length - (categories?.length % 6 === 0 ? 6 : categories?.length % 6)
-                  ? 'border-b border-border'
+                  ? 'border-b border-[rgba(0,0,0,0.06)]'
                   : ''
-              } ${(i + 1) % 6 !== 0 ? 'border-r border-border' : ''}`}
+              } ${(i + 1) % 6 !== 0 ? 'border-r border-[rgba(0,0,0,0.06)]' : ''}`}
             >
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-border group-hover:border-primary transition-all duration-300 group-hover:shadow-md group-hover:shadow-primary/20">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border border-[rgba(0,0,0,0.06)] group-hover:border-primary/25 transition-all duration-300 group-hover:shadow-[0_8px_24px_rgba(168,62,27,0.1)]">
                 <AppImage
                   src={cat?.image}
                   alt={cat?.alt}
@@ -134,7 +134,7 @@ export default function CategoryBrowser() {
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
               </div>
-              <span className="text-xs font-semibold text-foreground text-center leading-tight group-hover:text-primary transition-colors">
+              <span className="text-[11px] font-bold text-foreground text-center leading-tight group-hover:text-primary transition-colors" style={{ letterSpacing: '0.02em' }}>
                 {cat?.name}
               </span>
             </Link>
