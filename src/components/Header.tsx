@@ -57,13 +57,13 @@ export default function Header() {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-lg shadow-black/5' : 'bg-white'}`}
+        className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.06)]' : 'bg-white'}`}
       >
         {/* Announcement Bar */}
-        <div className="bg-gradient-to-r from-primary via-accent to-primary text-white py-2 px-4 text-center text-xs font-medium hidden sm:block">
-          🎉 Free delivery on orders over ₹499 &nbsp;·&nbsp;
-          <Link href="/offers" className="font-bold underline cursor-pointer hover:text-white/80">
-            View Offers →
+        <div className="bg-foreground text-white py-2 px-4 text-center text-[11px] font-semibold tracking-[0.08em] uppercase hidden sm:block">
+          Free delivery on orders over ₹499 &nbsp;·&nbsp;
+          <Link href="/offers" className="font-bold underline cursor-pointer hover:text-white/70 transition-colors">
+            View Offers
           </Link>
         </div>
 
@@ -75,7 +75,7 @@ export default function Header() {
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
                 <span className="text-white font-black text-lg">S</span>
               </div>
-              <span className="font-black text-xl tracking-tight text-foreground hidden sm:block">
+              <span className="font-display font-bold text-xl tracking-tight text-foreground hidden sm:block">
                 Snack<span className="text-primary">-Pod</span>
               </span>
             </Link>
@@ -86,7 +86,7 @@ export default function Header() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className="px-4 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground hover:bg-secondary rounded-full transition-all duration-200"
+                  className="px-4 py-2 text-sm font-semibold text-[#736B66] hover:text-foreground hover:bg-secondary rounded-full transition-all duration-200"
                 >
                   {link.label}
                 </Link>
@@ -192,7 +192,7 @@ export default function Header() {
                             setUserMenuOpen(false);
                             logout();
                           }}
-                          className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors"
+                  className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors"
                         >
                           <Icon name="ArrowRightOnRectangleIcon" size={16} />
                           <span>Sign Out</span>
@@ -204,7 +204,7 @@ export default function Header() {
               ) : (
                 <Link
                   href="/signin"
-                  className="px-3.5 py-1.5 bg-primary hover:bg-[#C94816] text-white text-xs font-bold rounded-full transition-all shadow-sm hover:shadow flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 bg-primary hover:bg-[#8E3316] text-white text-xs font-bold rounded-full transition-all shadow-sm hover:shadow flex items-center gap-1.5"
                 >
                   <Icon name="UserIcon" size={16} />
                   <span>Sign In</span>
@@ -277,7 +277,7 @@ export default function Header() {
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
               <span className="text-white font-black">S</span>
             </div>
-            <span className="font-black text-lg text-foreground">
+            <span className="font-display font-bold text-lg text-foreground">
               Snack<span className="text-primary">-Pod</span>
             </span>
           </Link>

@@ -36,22 +36,22 @@ export default function TrendingDishes() {
     <section>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-black text-foreground">Current Flavor Trends</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <h2 className="text-2xl font-display font-bold text-foreground" style={{ letterSpacing: '-0.03em' }}>Current Flavor Trends</h2>
+          <p className="text-sm text-[#736B66] mt-0.5" style={{ letterSpacing: '0.02em' }}>
             What everyone&apos;s ordering right now
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => scroll('left')}
-            className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:border-primary hover:text-primary hover:bg-orange-50 transition-all"
+            className="w-9 h-9 rounded-full border border-[rgba(0,0,0,0.08)] flex items-center justify-center hover:border-primary/25 hover:text-primary hover:bg-[#FAF7F2] transition-all"
             aria-label="Scroll left"
           >
             <Icon name="ChevronLeftIcon" size={16} />
           </button>
           <button
             onClick={() => scroll('right')}
-            className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:border-primary hover:text-primary hover:bg-orange-50 transition-all"
+            className="w-9 h-9 rounded-full border border-[rgba(0,0,0,0.08)] flex items-center justify-center hover:border-primary/25 hover:text-primary hover:bg-[#FAF7F2] transition-all"
             aria-label="Scroll right"
           >
             <Icon name="ChevronRightIcon" size={16} />

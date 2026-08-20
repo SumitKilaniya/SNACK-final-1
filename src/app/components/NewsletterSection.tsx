@@ -12,7 +12,7 @@ export default function NewsletterSection() {
   };
 
   return (
-    <section className="relative bg-foreground overflow-hidden mt-8">
+    <section className="relative bg-[#1A1615] overflow-hidden mt-8">
       <div className="max-w-7xl mx-auto px-4 py-14 flex items-center justify-center relative">
         {/* Left food image */}
         <div className="absolute left-0 bottom-0 w-48 h-40 hidden lg:block">
@@ -27,10 +27,10 @@ export default function NewsletterSection() {
 
         {/* Center content */}
         <div className="text-center z-10 max-w-lg">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">
+          <h2 className="text-2xl sm:text-3xl font-display font-bold text-white mb-2">
             Enjoy 40% Off — Get Your Coupon Now!
           </h2>
-          <p className="text-sm text-white/60 mb-6">by Subscribe our Newsletter</p>
+          <p className="text-sm text-white/40 mb-6" style={{ letterSpacing: '0.02em' }}>by subscribing to our Newsletter</p>
 
           {subscribed ? (
             <div className="flex items-center justify-center gap-2 text-primary font-semibold">
@@ -39,14 +39,14 @@ export default function NewsletterSection() {
           ) : (
             <form
               onSubmit={handleSubmit}
-              className="flex gap-0 rounded overflow-hidden border border-white/20 max-w-sm mx-auto"
+              className="flex gap-0 rounded-lg overflow-hidden border border-white/15 max-w-sm mx-auto"
             >
               <input
                 type="email"
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 px-4 py-3 bg-white text-foreground text-sm outline-none placeholder:text-muted-foreground"
+                className="flex-1 px-4 py-3 bg-white text-foreground text-sm outline-none placeholder:text-[#736B66]"
                 required
               />
 

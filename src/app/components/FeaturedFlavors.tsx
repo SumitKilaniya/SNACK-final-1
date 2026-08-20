@@ -50,12 +50,12 @@ export default function FeaturedFlavors() {
     <section ref={sectionRef} className={`scroll-pop ${visible ? 'popped' : ''}`}>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-black text-foreground">Featured Flavors</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">Chef&apos;s handpicked favorites</p>
+          <h2 className="text-2xl font-display font-bold text-foreground" style={{ letterSpacing: '-0.03em' }}>Featured Flavors</h2>
+          <p className="text-sm text-[#736B66] mt-0.5" style={{ letterSpacing: '0.02em' }}>Chef&apos;s handpicked favorites</p>
         </div>
         <Link
           href="/menu"
-          className="px-5 py-2 bg-primary text-white text-sm font-bold rounded-full hover:bg-accent transition-colors btn-spring shadow-sm shadow-primary/20"
+          className="px-5 py-2 bg-primary text-white text-sm font-bold btn-pill hover:bg-accent transition-colors btn-spring shadow-sm shadow-primary/20"
         >
           See All
         </Link>
