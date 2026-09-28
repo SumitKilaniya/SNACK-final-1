@@ -125,7 +125,7 @@ export const menuItems: Dish[] = [
     rating: 4.2,
     isVeg: true,
     sizes: ['Regular', 'Large'],
-    image: '/images/dishes/3.webp',
+    image: '/images/dishes/veggie-burger.webp',
     imageAlt:
       'Fresh veggie burger with green lettuce and colourful toppings on a bright background',
   },
@@ -233,8 +233,8 @@ export const menuItems: Dish[] = [
     price: 420,
     rating: 4.2,
     isVeg: false,
-    image: '/images/categories/cat_seafood.webp',
-    imageAlt: 'Grilled seafood platter with prawns and fish on a dark background',
+    image: '/images/dishes/grilled-fish.webp',
+    imageAlt: 'Flame-grilled fish fillet with lemon and herbs on a plate',
   },
 
   // ── Vegetarian ──────────────────────────────────────────────────
@@ -326,8 +326,8 @@ export const menuItems: Dish[] = [
     price: 199,
     rating: 4.2,
     isVeg: true,
-    image: '/images/categories/cat_soups.webp',
-    imageAlt: 'Creamy orange soup in a white bowl with herbs on top',
+    image: '/images/dishes/tomato-basil-soup.webp',
+    imageAlt: 'Creamy tomato basil soup in a white bowl with herbs on top',
   },
   {
     key: 'cream-mushroom-soup',
@@ -431,7 +431,7 @@ export const menuItems: Dish[] = [
     price: 299,
     rating: 4.1,
     isVeg: true,
-    image: '/images/categories/cat_salads.webp',
+    image: '/images/dishes/garden-salad.webp',
     imageAlt: 'Fresh garden salad with colorful vegetables in a white bowl',
   },
 
@@ -528,8 +528,8 @@ export const menuItems: Dish[] = [
     rating: 4.4,
     isVeg: true,
     badge: 'New Flavor',
-    image: '/images/categories/cat_desserts.webp',
-    imageAlt: 'Elegant chocolate dessert cake with berries on a dark plate',
+    image: '/images/dishes/gulab-cheesecake.webp',
+    imageAlt: 'Baked cheesecake topped with warm gulab jamun and rose syrup',
   },
 
   // ── Speciality ──────────────────────────────────────────────────
@@ -621,8 +621,8 @@ export const menuItems: Dish[] = [
     price: 379,
     rating: 4.5,
     isVeg: true,
-    image: '/images/categories/cat_pasta.webp',
-    imageAlt: 'Creamy pasta dish with sauce being poured from above',
+    image: '/images/dishes/alfredo-pasta.webp',
+    imageAlt: 'Creamy fettuccine alfredo with parmesan and grilled mushrooms',
   },
 
   // ── Side Dishes ─────────────────────────────────────────────────

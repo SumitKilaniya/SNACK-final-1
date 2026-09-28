@@ -1,0 +1,402 @@
+{
+  "/images/dishes/zinger-burger.webp": {
+    "file": "/images/dishes/zinger-burger.webp",
+    "title": "File:Chicken-burger-combo (1).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Chicken-burger-combo_(1).jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 4.0",
+    "query": ""
+  },
+  "/images/dishes/veggie-burger.webp": {
+    "file": "/images/dishes/veggie-burger.webp",
+    "title": "File:Fancy Veggie Burger and Fries - Joe's Burger House 2024-07-07.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Fancy_Veggie_Burger_and_Fries_-_Joe%27s_Burger_House_2024-07-07.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC0",
+    "query": ""
+  },
+  "/images/dishes/nashville-burger.webp": {
+    "file": "/images/dishes/nashville-burger.webp",
+    "title": "File:Fried chicken Burger in Milan, Italy.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Fried_chicken_Burger_in_Milan,_Italy.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 3.0 it",
+    "query": ""
+  },
+  "/images/dishes/stir-fry.webp": {
+    "file": "/images/dishes/stir-fry.webp",
+    "title": "File:Vegetable stir-fry.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Vegetable_stir-fry.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC0",
+    "query": ""
+  },
+  "/images/dishes/cauliflower-tikka.webp": {
+    "file": "/images/dishes/cauliflower-tikka.webp",
+    "title": "File:Cauliflower Curry 4.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Cauliflower_Curry_4.JPG",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 4.0",
+    "query": ""
+  },
+  "/images/dishes/black-bean-tacos.webp": {
+    "file": "/images/dishes/black-bean-tacos.webp",
+    "title": "File:Vegetables and Black Bean Tacos (7212559656).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Vegetables_and_Black_Bean_Tacos_(7212559656).jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY 2.0",
+    "query": ""
+  },
+  "/images/dishes/calamari.webp": {
+    "file": "/images/dishes/calamari.webp",
+    "title": "File:Malaysian fried squid with buttermilk.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Malaysian_fried_squid_with_buttermilk.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 4.0",
+    "query": ""
+  },
+  "/images/dishes/scallops.webp": {
+    "file": "/images/dishes/scallops.webp",
+    "title": "File:Pan Seared Scallops from the Elora Mill Hotel Restaurant.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Pan_Seared_Scallops_from_the_Elora_Mill_Hotel_Restaurant.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 4.0",
+    "query": ""
+  },
+  "/images/dishes/prawn-tempura.webp": {
+    "file": "/images/dishes/prawn-tempura.webp",
+    "title": "File:Prawn-tempura-box.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Prawn-tempura-box.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 4.0",
+    "query": ""
+  },
+  "/images/dishes/grilled-fish.webp": {
+    "file": "/images/dishes/grilled-fish.webp",
+    "query": "grilled salmon steak",
+    "title": "File:Flame grilled salmon steaks (herb marinade recipe).jpg",
+    "source": "Wikimedia Commons",
+    "page": "https://commons.wikimedia.org/wiki/File:Flame_grilled_salmon_steaks_(herb_marinade_recipe).jpg",
+    "license": "CC BY 2.0"
+  },
+  "/images/dishes/veg-chili.webp": {
+    "file": "/images/dishes/veg-chili.webp",
+    "title": "File:Bowl of chili.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Bowl_of_chili.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 2.5",
+    "query": ""
+  },
+  "/images/dishes/acorn-squash.webp": {
+    "file": "/images/dishes/acorn-squash.webp",
+    "title": "File:Stuffed Acorn Squash (5163508046).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Stuffed_Acorn_Squash_(5163508046).jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY 2.0",
+    "query": ""
+  },
+  "/images/dishes/lentil-soup.webp": {
+    "file": "/images/dishes/lentil-soup.webp",
+    "title": "File:Homemade Lentil Soup - Lavash 2025-02-10.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Homemade_Lentil_Soup_-_Lavash_2025-02-10.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC0",
+    "query": ""
+  },
+  "/images/dishes/butternut-squash-soup.webp": {
+    "file": "/images/dishes/butternut-squash-soup.webp",
+    "title": "File:Butternut squash soup - El Dorado Kitchen - Nov 2018 - Sarah Stierch 01.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Butternut_squash_soup_-_El_Dorado_Kitchen_-_Nov_2018_-_Sarah_Stierch_01.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY 4.0",
+    "query": ""
+  },
+  "/images/dishes/ribeye.webp": {
+    "file": "/images/dishes/ribeye.webp",
+    "title": "File:Ribeyes.jpeg",
+    "page": "https://commons.wikimedia.org/wiki/File:Ribeyes.jpeg",
+    "source": "Wikimedia Commons",
+    "license": "Public domain",
+    "query": ""
+  },
+  "/images/dishes/tandoori-chicken.webp": {
+    "file": "/images/dishes/tandoori-chicken.webp",
+    "title": "File:Tandoori chicken Indian.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Tandoori_chicken_Indian.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 2.0",
+    "query": ""
+  },
+  "/images/dishes/caesar-salad.webp": {
+    "file": "/images/dishes/caesar-salad.webp",
+    "title": "File:Caesar Salad - Purezza 2023-11-22.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Caesar_Salad_-_Purezza_2023-11-22.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC0",
+    "query": ""
+  },
+  "/images/dishes/quinoa-salad.webp": {
+    "file": "/images/dishes/quinoa-salad.webp",
+    "title": "File:Healthy quinoa salad with dried fruit.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Healthy_quinoa_salad_with_dried_fruit.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY 4.0",
+    "query": ""
+  },
+  "/images/dishes/mango-lassi.webp": {
+    "file": "/images/dishes/mango-lassi.webp",
+    "query": "mango lassi",
+    "title": "File:Mango Lassi .jpg",
+    "source": "Wikimedia Commons",
+    "page": "https://commons.wikimedia.org/wiki/File:Mango_Lassi_.jpg",
+    "license": "CC BY-SA 3.0"
+  },
+  "/images/dishes/classic-pepsi.webp": {
+    "file": "/images/dishes/classic-pepsi.webp",
+    "title": "File:Glass cola.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Glass_cola.jpg",
+    "source": "Wikimedia Commons",
+    "license": "Public domain",
+    "query": ""
+  },
+  "/images/dishes/chocolate-lava-cake.webp": {
+    "file": "/images/dishes/chocolate-lava-cake.webp",
+    "title": "File:Chocolate lava cake.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Chocolate_lava_cake.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY 2.0",
+    "query": ""
+  },
+  "/images/dishes/tiramisu.webp": {
+    "file": "/images/dishes/tiramisu.webp",
+    "title": "File:Classic Italian Tiramisu-3 (29989504485).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Classic_Italian_Tiramisu-3_(29989504485).jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY 2.0",
+    "query": ""
+  },
+  "/images/dishes/butter-chicken-biryani.webp": {
+    "file": "/images/dishes/butter-chicken-biryani.webp",
+    "title": "File:Chicken biryani 02-06-2015 (India).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Chicken_biryani_02-06-2015_(India).jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 4.0",
+    "query": ""
+  },
+  "/images/dishes/paneer-biryani.webp": {
+    "file": "/images/dishes/paneer-biryani.webp",
+    "title": "File:Biryani in Hyderabad.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Biryani_in_Hyderabad.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY 4.0",
+    "query": ""
+  },
+  "/images/dishes/dal-makhani.webp": {
+    "file": "/images/dishes/dal-makhani.webp",
+    "title": "File:Dal Makhani.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Dal_Makhani.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 2.0",
+    "query": ""
+  },
+  "/images/dishes/rogan-josh.webp": {
+    "file": "/images/dishes/rogan-josh.webp",
+    "title": "File:Rogan josh02.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Rogan_josh02.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY 2.0",
+    "query": ""
+  },
+  "/images/dishes/ravioli.webp": {
+    "file": "/images/dishes/ravioli.webp",
+    "title": "File:Ravioli di Faraona.JPG",
+    "page": "https://commons.wikimedia.org/wiki/File:Ravioli_di_Faraona.JPG",
+    "source": "Wikimedia Commons",
+    "license": "Public domain",
+    "query": ""
+  },
+  "/images/dishes/zucchini-pesto.webp": {
+    "file": "/images/dishes/zucchini-pesto.webp",
+    "query": "zoodles",
+    "title": "File:Zoodles - Zucchini Spirals at Noodles and Company (41891311712).jpg",
+    "source": "Wikimedia Commons",
+    "page": "https://commons.wikimedia.org/wiki/File:Zoodles_-_Zucchini_Spirals_at_Noodles_and_Company_(41891311712).jpg",
+    "license": "CC BY 2.0"
+  },
+  "/images/dishes/coleslaw.webp": {
+    "file": "/images/dishes/coleslaw.webp",
+    "title": "File:Bowl'o'Coleslaw modified.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Bowl%27o%27Coleslaw_modified.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 2.0",
+    "query": ""
+  },
+  "/images/dishes/onion-rings.webp": {
+    "file": "/images/dishes/onion-rings.webp",
+    "title": "File:Onion rings served in Fort William.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Onion_rings_served_in_Fort_William.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 4.0",
+    "query": ""
+  },
+  "/images/dishes/spring-rolls.webp": {
+    "file": "/images/dishes/spring-rolls.webp",
+    "title": "File:PermaLiv spring-rolls 07-06-20.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:PermaLiv_spring-rolls_07-06-20.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 4.0",
+    "query": ""
+  },
+  "/images/dishes/paneer-tikka.webp": {
+    "file": "/images/dishes/paneer-tikka.webp",
+    "title": "File:Paneer Tikka Shashlik PK012.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Paneer_Tikka_Shashlik_PK012.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 4.0",
+    "query": ""
+  },
+  "/images/dishes/chicken-nuggets.webp": {
+    "file": "/images/dishes/chicken-nuggets.webp",
+    "title": "File:Impossible chicken nuggets 2.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Impossible_chicken_nuggets_2.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC0",
+    "query": ""
+  },
+  "/images/dishes/loaded-nachos.webp": {
+    "file": "/images/dishes/loaded-nachos.webp",
+    "title": "File:Nachos-cheese (cropped).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Nachos-cheese_(cropped).jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY 2.0",
+    "query": ""
+  },
+  "/images/dishes/fresh-lime-soda.webp": {
+    "file": "/images/dishes/fresh-lime-soda.webp",
+    "query": "limeade mint glass",
+    "title": "A close-up of a virgin mojito in a tall glass with ice, mint leaves, and lemon and lime slices.",
+    "source": "Openverse",
+    "page": "https://wordpress.org/photos/photo/463697a13b/",
+    "license": "CC0 1.0"
+  },
+  "/images/dishes/choco-lava-shake.webp": {
+    "file": "/images/dishes/choco-lava-shake.webp",
+    "title": "File:Burger King Chocolate Milkshake (43925151774).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Burger_King_Chocolate_Milkshake_(43925151774).jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 2.0",
+    "query": ""
+  },
+  "/images/dishes/grilled-chicken-combo.webp": {
+    "file": "/images/dishes/grilled-chicken-combo.webp",
+    "title": "File:Grilled chicken and risotto.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Grilled_chicken_and_risotto.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 4.0",
+    "query": ""
+  },
+  "/images/categories/cat_main-course.webp": {
+    "file": "/images/categories/cat_main-course.webp",
+    "title": "File:Chef-Heikki Liekola-Main course-20.3.2014-by-ManneStenros-via-Flickr.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Chef-Heikki_Liekola-Main_course-20.3.2014-by-ManneStenros-via-Flickr.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY 2.0",
+    "query": ""
+  },
+  "/images/categories/cat_seafood.webp": {
+    "file": "/images/categories/cat_seafood.webp",
+    "title": "File:Seafood platter in Paris.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Seafood_platter_in_Paris.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 4.0",
+    "query": ""
+  },
+  "/images/categories/cat_vegetarian.webp": {
+    "file": "/images/categories/cat_vegetarian.webp",
+    "title": "File:Vegetarian rice and mixed fresh vegetables dish.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Vegetarian_rice_and_mixed_fresh_vegetables_dish.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY 4.0",
+    "query": ""
+  },
+  "/images/categories/cat_soups.webp": {
+    "file": "/images/categories/cat_soups.webp",
+    "query": "soup in bowl vegetables",
+    "title": "File:-2022-02-01 Bowl of spring vegetable soup, Trimingham, Norfolk.JPG",
+    "source": "Wikimedia Commons",
+    "page": "https://commons.wikimedia.org/wiki/File:-2022-02-01_Bowl_of_spring_vegetable_soup,_Trimingham,_Norfolk.JPG",
+    "license": "CC BY-SA 4.0"
+  },
+  "/images/categories/cat_salads.webp": {
+    "file": "/images/categories/cat_salads.webp",
+    "title": "File:Fresh salad with arugula, cabbage and tomato in a glass bowl.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Fresh_salad_with_arugula,_cabbage_and_tomato_in_a_glass_bowl.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 3.0",
+    "query": ""
+  },
+  "/images/categories/cat_pasta.webp": {
+    "file": "/images/categories/cat_pasta.webp",
+    "title": "File:Pork tagliatelle pasta dish at restaurant in Rome, Italy.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Pork_tagliatelle_pasta_dish_at_restaurant_in_Rome,_Italy.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 2.0",
+    "query": ""
+  },
+  "/images/categories/cat_starters.webp": {
+    "file": "/images/categories/cat_starters.webp",
+    "title": "File:Appetizer Platter.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Appetizer_Platter.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY 4.0",
+    "query": ""
+  },
+  "/images/banners/promo_1.webp": {
+    "file": "/images/banners/promo_1.webp",
+    "title": "File:South-East Asian noodle soup in bowl with spoon.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:South-East_Asian_noodle_soup_in_bowl_with_spoon.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY-SA 4.0",
+    "query": ""
+  },
+  "/images/banners/promo_2.webp": {
+    "file": "/images/banners/promo_2.webp",
+    "title": "File:Tomato and basil pasta (4925750112).jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Tomato_and_basil_pasta_(4925750112).jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC BY 2.0",
+    "query": ""
+  },
+  "/images/banners/promo_3.webp": {
+    "file": "/images/banners/promo_3.webp",
+    "title": "File:Berry Crumble Cheesecake - Garden Café Brighton 2025-04-07.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Berry_Crumble_Cheesecake_-_Garden_Caf%C3%A9_Brighton_2025-04-07.jpg",
+    "source": "Wikimedia Commons",
+    "license": "CC0",
+    "query": ""
+  },
+  "/images/banners/deal_2.webp": {
+    "file": "/images/banners/deal_2.webp",
+    "title": "File:Cheeseburger.jpg",
+    "page": "https://commons.wikimedia.org/wiki/File:Cheeseburger.jpg",
+    "source": "Wikimedia Commons",
+    "license": "Public domain",
+    "query": ""
+  },
+  "/images/dishes/3.webp": {
+    "file": "/images/dishes/3.webp",
+    "query": "burger fries meal tray",
+    "title": "File:Hamburger meal at KFC Redi.jpg",
+    "source": "Wikimedia Commons",
+    "page": "https://commons.wikimedia.org/wiki/File:Hamburger_meal_at_KFC_Redi.jpg",
+    "license": "CC BY-SA 4.0"
+  },
+  "/images/banners/newsletter_2.webp": {
+    "file": "/images/banners/newsletter_2.webp",
+    "query": "waffle with strawberries and cream",
+    "title": "File:Waffle with Strawberries and Whipped Cream @ Ti Amo Café (6652239081).jpg",
+    "source": "Wikimedia Commons",
+    "page": "https://commons.wikimedia.org/wiki/File:Waffle_with_Strawberries_and_Whipped_Cream_@_Ti_Amo_Caf%C3%A9_(6652239081).jpg",
+    "license": "CC BY 2.0"
+  }
+}

@@ -18,8 +18,8 @@ const PIN_INDIRANAGAR = JSON.stringify(['560038', '560075', '560008']);
 
 // ── Master catalog ──────────────────────────────────────────────────────────
 // Prices are whole rupees (int), matching the app's existing ₹ pricing.
-// imageUrl maps each item to the closest file in public/images/dishes/ (items
-// without a reasonable match keep null — listed in the Phase 2 summary).
+// imageUrl maps each item to a real photo of that dish in public/images/dishes/
+// (every item has one, so no card falls back to a placeholder).
 // isBestseller carries over from the old hardcoded menu-data.ts list so the
 // "★ Bestseller" badges stay visible after the UI cutover.
 const MENU = [
@@ -31,13 +31,13 @@ const MENU = [
   { id: 'item_masala_fries', name: 'Masala Fries', category: 'side-dishes', price: 89, veg: true, desc: 'Fries tossed in Indian spice mix with a side of ketchup.', imageUrl: '/images/dishes/salted-fries.webp' },
   { id: 'item_chicken_wings', name: 'Spicy Chicken Wings (6 pc)', category: 'starters', price: 179, veg: false, desc: 'Sticky-spicy wings with cooling ranch dip.', imageUrl: '/images/dishes/bbq-wings.webp' },
   { id: 'item_veg_spring_rolls', name: 'Veg Spring Rolls (4 pc)', category: 'starters', price: 109, veg: true, desc: 'Crisp rolls stuffed with glass noodles and vegetables.', imageUrl: '/images/dishes/spring-rolls.webp' },
-  { id: 'item_chicken_nuggets', name: 'Chicken Nuggets (8 pc)', category: 'side-dishes', price: 139, veg: false, desc: 'Golden nuggets with smoky BBQ dip.', imageUrl: null },
-  { id: 'item_loaded_nachos', name: 'Loaded Nachos', category: 'starters', price: 159, veg: true, desc: 'Corn nachos loaded with cheese, salsa and jalapeños.', imageUrl: null },
+  { id: 'item_chicken_nuggets', name: 'Chicken Nuggets (8 pc)', category: 'side-dishes', price: 139, veg: false, desc: 'Golden nuggets with smoky BBQ dip.', imageUrl: '/images/dishes/chicken-nuggets.webp' },
+  { id: 'item_loaded_nachos', name: 'Loaded Nachos', category: 'starters', price: 159, veg: true, desc: 'Corn nachos loaded with cheese, salsa and jalapeños.', imageUrl: '/images/dishes/loaded-nachos.webp' },
   { id: 'item_cold_coffee', name: 'Cold Coffee', category: 'beverages', price: 89, veg: true, desc: 'Frosty blended coffee with cream.', imageUrl: '/images/dishes/cold-coffee-frappe.webp', isBestseller: true },
-  { id: 'item_fresh_lime_soda', name: 'Fresh Lime Soda', category: 'beverages', price: 59, veg: true, desc: 'Zesty lime soda, sweet or salted.', imageUrl: null },
-  { id: 'item_choco_lava_shake', name: 'Choco Lava Shake', category: 'beverages', price: 149, veg: true, desc: 'Thick chocolate shake with molten core.', imageUrl: null },
+  { id: 'item_fresh_lime_soda', name: 'Fresh Lime Soda', category: 'beverages', price: 59, veg: true, desc: 'Zesty lime soda, sweet or salted.', imageUrl: '/images/dishes/fresh-lime-soda.webp' },
+  { id: 'item_choco_lava_shake', name: 'Choco Lava Shake', category: 'beverages', price: 149, veg: true, desc: 'Thick chocolate shake with molten core.', imageUrl: '/images/dishes/choco-lava-shake.webp' },
   { id: 'item_chocolate_brownie', name: 'Chocolate Brownie', category: 'desserts', price: 119, veg: true, desc: 'Warm fudgy brownie with a scoop of vanilla.', imageUrl: '/images/dishes/molten-brownie.webp' },
-  { id: 'item_grilled_chicken_combo', name: 'Grilled Chicken Combo', category: 'main-course', price: 299, veg: false, desc: 'Grilled chicken, peri fries, drink and a brownie.', imageUrl: null },
+  { id: 'item_grilled_chicken_combo', name: 'Grilled Chicken Combo', category: 'main-course', price: 299, veg: false, desc: 'Grilled chicken, peri fries, drink and a brownie.', imageUrl: '/images/dishes/grilled-chicken-combo.webp' },
   { id: 'item_veg_meal_combo', name: 'Veg Meal Combo', category: 'main-course', price: 249, veg: true, desc: 'Veg burger, masala fries, drink and a brownie.', imageUrl: '/images/dishes/3.webp' },
 ];
 
