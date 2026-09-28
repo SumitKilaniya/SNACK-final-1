@@ -9,6 +9,9 @@ export default defineConfig({
   test: {
     environment: 'node',
     globals: true,
+    // Unit tests only. The default glob also matches e2e/*.spec.ts, which are
+    // Playwright tests (`bunx playwright test`) and cannot load under vitest.
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
   },
   resolve: {
     alias: {
