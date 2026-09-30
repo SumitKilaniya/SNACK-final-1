@@ -90,7 +90,7 @@ export const menuItems: Dish[] = [
   // ── Main Courses ────────────────────────────────────────────────
   {
     key: 'zinger-burger',
-    categoryId: 'main-course',
+    categoryId: 'burgers',
     name: 'Zinger Tower Burger',
     description:
       'Crispy chicken fillet, double cheese slices, jalapeños, signature zinger sauce in a toasted bun',
@@ -104,7 +104,7 @@ export const menuItems: Dish[] = [
   },
   {
     key: 'bbq-burger',
-    categoryId: 'main-course',
+    categoryId: 'burgers',
     name: 'Smoky BBQ Crunch Burger',
     description:
       'Double beef patty, caramelised onions, crispy onion rings, smoky BBQ sauce, pickles',
@@ -117,7 +117,7 @@ export const menuItems: Dish[] = [
   },
   {
     key: 'veggie-burger',
-    categoryId: 'main-course',
+    categoryId: 'burgers',
     name: 'Veggie Crunch Burger',
     description:
       'Crispy aloo tikki patty, fresh lettuce, tomato, mint chutney, chipotle mayo in a soft bun',
@@ -131,7 +131,7 @@ export const menuItems: Dish[] = [
   },
   {
     key: 'nashville-burger',
-    categoryId: 'main-course',
+    categoryId: 'burgers',
     name: 'Fiery Nashville Hot Burger',
     description:
       'Buttermilk-fried chicken tossed in Nashville hot sauce, pickles, slaw, honey drizzle',

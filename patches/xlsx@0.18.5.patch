@@ -1,0 +1,12 @@
+diff --git a/types/tsconfig.json b/types/tsconfig.json
+index 63534df95ec6bebbef971c6b39c8f60744a1d39f..51dc670718d3ae6cf9cd3ad0fe23f7a6d96391b5 100644
+--- a/types/tsconfig.json
++++ b/types/tsconfig.json
+@@ -5,7 +5,6 @@
+         "noImplicitAny": true,
+         "noImplicitThis": true,
+         "strictNullChecks": false,
+-        "baseUrl": ".",
+         "paths": { "xlsx": ["."] },
+         "types": [],
+         "noEmit": true,

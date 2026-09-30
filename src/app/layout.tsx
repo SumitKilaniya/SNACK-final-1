@@ -6,17 +6,7 @@ import '@/lib/env';
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans, Playfair_Display } from 'next/font/google';
-import { AuthProvider } from '@/lib/auth-context';
-import { CartProvider } from '@/lib/cart-context';
-import { WishlistProvider } from '@/lib/wishlist-context';
-import { ToastProvider } from '@/lib/toast-context';
-import { OrdersProvider } from '@/lib/orders-context';
-import { ReviewsProvider } from '@/lib/reviews-context';
-import { MenuProvider } from '@/lib/menu-context';
-import { OffersProvider } from '@/lib/offers-context';
-import { BranchesProvider } from '@/lib/branches-context';
-import GlobalFloatingCart from '@/app/menu/components/FloatingCart';
-import CartDrawer from '@/components/CartDrawer';
+import AppProviders from './AppProviders';
 import '../styles/tailwind.css';
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -52,31 +42,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en" className={`${plusJakartaSans.variable} ${playfairDisplay.variable}`}>
       <body className={plusJakartaSans.className}>
-        <AuthProvider>
-          {/* Branches above Menu: the menu is branch-scoped, so MenuProvider
-              reads the selected branch from BranchesProvider. */}
-          <BranchesProvider>
-            <MenuProvider>
-              <OffersProvider>
-                <OrdersProvider>
-                  <ReviewsProvider>
-                    {/* ToastProvider above CartProvider: the cart context shows
-                        toasts (guest-cart merge outcomes, branch-switch clears). */}
-                    <ToastProvider>
-                      <CartProvider>
-                        <WishlistProvider>
-                          {children}
-                          <GlobalFloatingCart />
-                          <CartDrawer />
-                        </WishlistProvider>
-                      </CartProvider>
-                    </ToastProvider>
-                  </ReviewsProvider>
-                </OrdersProvider>
-              </OffersProvider>
-            </MenuProvider>
-          </BranchesProvider>
-        </AuthProvider>
+        <AppProviders>{children}</AppProviders>
 
         {/* Root Layout */}
       </body>

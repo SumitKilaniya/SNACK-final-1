@@ -21,6 +21,7 @@ const NAV_ITEMS: {
   { label: 'Branches', href: '/admin/branches', icon: 'Building2', roles: ['SUPER_ADMIN'] },
   { label: 'Reports & Analytics', href: '/admin/reports', icon: 'BarChart3', roles: ['BRANCH_ADMIN', 'SUPER_ADMIN'] },
   { label: 'User Accounts', href: '/admin/users', icon: 'Users', roles: ['SUPER_ADMIN'] },
+  { label: 'Customer Data', href: '/admin/customers', icon: 'UsersRound', roles: ['SUPER_ADMIN'] },
   { label: 'Review Moderation', href: '/admin/reviews', icon: 'Star', roles: ['SUPER_ADMIN'] },
 ];
 
