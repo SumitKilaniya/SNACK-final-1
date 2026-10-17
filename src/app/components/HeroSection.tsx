@@ -39,10 +39,10 @@ export default function HeroSection() {
       <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-primary/[0.03] blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full bg-accent/[0.05] blur-3xl pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 w-full py-16 sm:py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 w-full py-8 sm:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
           {/* Left — Text Content */}
-          <div className="order-2 lg:order-1 text-center lg:text-left">
+          <div className="order-1 lg:order-1 text-center lg:text-left">
             {/* Eyebrow badge — tracking-widest micro-copy */}
             <div className="inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm border border-[rgba(0,0,0,0.06)] rounded-full px-5 py-1.5 mb-8 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
               <span className="w-1.5 h-1.5 rounded-full bg-primary" />
@@ -79,7 +79,7 @@ export default function HeroSection() {
             </p>
 
             {/* CTA Buttons — pill shape, translateY(-2px) hover */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8 sm:mb-12">
               <Link
                 href="/menu"
                 className="btn-pill inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white font-bold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 text-sm"
@@ -117,25 +117,25 @@ export default function HeroSection() {
           </div>
 
           {/* Right — Continuously Rotating Dish */}
-          <div className="order-1 lg:order-2 flex items-center justify-center relative py-10">
+          <div className="order-2 lg:order-2 flex items-center justify-center relative py-4 sm:py-10">
             {/* Outer decorative rings */}
             <div
-              className="absolute w-[440px] h-[440px] sm:w-[600px] sm:h-[600px] rounded-full border-2 border-dashed border-primary/10 hero-ring animate-hero-spin"
+              className="absolute w-[min(86vw,440px)] h-[min(86vw,440px)] sm:w-[600px] sm:h-[600px] rounded-full border-2 border-dashed border-primary/10 hero-ring animate-hero-spin"
               style={animStyle}
             />
             <div
-              className="absolute w-[360px] h-[360px] sm:w-[520px] sm:h-[520px] rounded-full border border-primary/[0.07] hero-ring animate-hero-spin-reverse"
+              className="absolute w-[min(76vw,360px)] h-[min(76vw,360px)] sm:w-[520px] sm:h-[520px] rounded-full border border-primary/[0.07] hero-ring animate-hero-spin-reverse"
               style={animStyle}
             />
 
             {/* Dish stage — continuous 35s spin */}
             <div
-              className="relative w-[360px] h-[360px] sm:w-[500px] sm:h-[500px]"
+              className="relative w-[min(68vw,360px)] h-[min(68vw,360px)] sm:w-[500px] sm:h-[500px]"
             >
               {/* The dish — rotates continuously */}
               <div
                 className="absolute inset-0 hero-dish-spin"
-                style={{ willChange: 'transform', ...animStyle }}
+                style={animStyle}
               >
                 <div className="absolute inset-0 rounded-full overflow-hidden shadow-[0_32px_64px_rgba(0,0,0,0.10)]">
                   <AppImage

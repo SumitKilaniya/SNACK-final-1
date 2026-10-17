@@ -93,6 +93,11 @@ Seed accounts (dev only): `super_admin@snackpod.local / SuperAdmin@123!`,
 - `bun test` — unit tests (coupon pricing, order state machine)
 - `bun run lint` / `bun run format` — ESLint / Prettier
 
+For production-like response times, use `bun run build` followed by
+`bun run start`; the development server compiles routes on demand. The
+development component tagger is disabled by default to reduce compile
+overhead; set `ENABLE_COMPONENT_TAGGER=true` when you need it.
+
 ## Deployment & operations
 
 See **[DEPLOYMENT.md](./DEPLOYMENT.md)** — the operational manual: managed

@@ -2,8 +2,9 @@ import { imageHosts } from './image-hosts.config.mjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'standalone',
-    productionBrowserSourceMaps: true,
+    // pnpm's symlinked dependencies cannot be copied into standalone output on
+    // Windows without Developer Mode; keep standalone output for Linux deploys.
+    output: process.platform === 'win32' ? undefined : 'standalone',
     typescript: {
         ignoreBuildErrors: true,
     },
@@ -42,7 +43,8 @@ const nextConfig = {
             dev: dev
         }
     ) {
-        if (dev) {
+        // Component tagging is opt-in because its loader slows dev compilation.
+        if (dev && process.env.ENABLE_COMPONENT_TAGGER === 'true') {
             config.module.rules.push({
                 test: /\.(jsx|tsx)$/,
                 exclude: [/node_modules/],

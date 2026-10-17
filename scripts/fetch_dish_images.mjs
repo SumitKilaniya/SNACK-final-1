@@ -17,6 +17,8 @@
  *   node scripts/fetch_dish_images.mjs            # every missing target
  *   node scripts/fetch_dish_images.mjs --limit 12 # at most 12 per run
  *   node scripts/fetch_dish_images.mjs --force    # re-download everything
+ *   node scripts/fetch_dish_images.mjs --replace-small # replace tiny dish placeholders
+ *   node scripts/fetch_dish_images.mjs --force --files garden-salad,watermelon-lemonade
  */
 
 import fs from 'node:fs';
@@ -31,10 +33,17 @@ const REQUEST_DELAY_MS = 400;
 
 const args = process.argv.slice(2);
 const FORCE = args.includes('--force');
+const REPLACE_SMALL = args.includes('--replace-small');
+const SMALL_DISH_IMAGE_BYTES = 8_000;
 const LIMIT = (() => {
   const i = args.indexOf('--limit');
   return i >= 0 && args[i + 1] ? Number(args[i + 1]) : Infinity;
 })();
+const FILES_INDEX = args.indexOf('--files');
+const FILE_FILTER =
+  FILES_INDEX >= 0
+    ? new Set((args[FILES_INDEX + 1] || '').split(',').map((file) => file.trim()).filter(Boolean))
+    : null;
 
 /**
  * Every target that needs a real dish photo. `file` is the output basename
@@ -82,6 +91,33 @@ const TARGETS = [
   { dir: 'dishes', file: 'choco-lava-shake', query: 'chocolate milkshake', width: 600 },
   { dir: 'dishes', file: 'grilled-chicken-combo', query: 'grilled chicken plate', width: 600 },
   { dir: 'dishes', file: '3', query: 'burger fries meal tray', avoid: /child|enjoys|people|man|woman|boy|girl|family|eating/, width: 600 },
+  { dir: 'dishes', file: '1', query: 'chicken burger fries cola meal', width: 600 },
+  { dir: 'dishes', file: '2', query: 'family burger meal fries', width: 600 },
+  { dir: 'dishes', file: 'dish_48', query: 'burger fries meal top view food', avoid: /person|woman|man|interior|building|sign/, width: 600 },
+  { dir: 'dishes', file: 'alfredo-pasta', query: 'fettuccine alfredo pasta', width: 600 },
+  { dir: 'dishes', file: 'bbq-burger', query: 'barbecue cheeseburger', width: 600 },
+  { dir: 'dishes', file: 'bbq-wings', query: 'barbecue chicken wings', width: 600 },
+  { dir: 'dishes', file: 'chickpea-curry', query: 'chickpea curry chana masala', width: 600 },
+  { dir: 'dishes', file: 'cold-coffee-frappe', query: 'iced coffee frappe', width: 600 },
+  { dir: 'dishes', file: 'corn-on-cob', query: 'grilled corn on the cob', width: 600 },
+  { dir: 'dishes', file: 'corn-tomato-fritters', query: 'corn pakora', avoid: /bacon|egg|lake|tour|historical|book|cookery/, width: 600 },
+  { dir: 'dishes', file: 'cream-mushroom-soup', query: 'cream of mushroom soup', width: 600 },
+  { dir: 'dishes', file: 'crispy-corn', query: 'fried corn kernels food', avoid: /corn dog|hot dog|sausage|egg|book|advert/, width: 600 },
+  { dir: 'dishes', file: 'eggplant-parmesan', query: 'eggplant parmesan', width: 600 },
+  { dir: 'dishes', file: 'garden-salad', query: 'green salad lettuce tomato bowl', avoid: /pork|chicken|ham|meat|book|wrap|sandwich/, width: 600 },
+  { dir: 'dishes', file: 'garlic-bread', query: 'garlic bread', avoid: /oyster|seafood|avocado/, width: 600 },
+  { dir: 'dishes', file: 'greek-wraps', query: 'falafel pita sandwich', avoid: /chicken|beef|lamb|easter|church|landscape|travel/, width: 600 },
+  { dir: 'dishes', file: 'gulab-cheesecake', query: 'cheesecake dessert', width: 600 },
+  { dir: 'dishes', file: 'hara-bhara-kebab', query: 'hara bhara kebab', width: 600 },
+  { dir: 'dishes', file: 'lamb-chops', query: 'grilled lamb chops', width: 600 },
+  { dir: 'dishes', file: 'molten-brownie', query: 'molten chocolate brownie dessert', width: 600 },
+  { dir: 'dishes', file: 'mushroom-risotto', query: 'mushroom risotto', width: 600 },
+  { dir: 'dishes', file: 'penne-arrabbiata', query: 'penne arrabbiata pasta', width: 600 },
+  { dir: 'dishes', file: 'peri-peri-fries', query: 'peri peri french fries', width: 600 },
+  { dir: 'dishes', file: 'salted-fries', query: 'french fries bowl', avoid: /hamburger|cheeseburger|burger/, width: 600 },
+  { dir: 'dishes', file: 'stuffed-peppers', query: 'stuffed bell pepper rice vegetables', avoid: /clam|shellfish|seafood|yuzu/, width: 600 },
+  { dir: 'dishes', file: 'tomato-basil-soup', query: 'tomato basil soup', width: 600 },
+  { dir: 'dishes', file: 'watermelon-lemonade', query: 'watermelon lemonade drink glass', avoid: /cookery|book|cookbook|illustration|drawing/, width: 600 },
 
   // ── Home page category tiles (src/app/components/CategoryBrowser.tsx) ────
   { dir: 'categories', file: 'cat_main-course', query: 'main course dish plate', width: 400 },
@@ -118,6 +154,7 @@ function normalizeTitle(raw) {
 /** Heuristic relevance/quality score for a candidate photo. */
 function scoreCandidate(candidate, query, avoid) {
   const title = normalizeTitle(candidate.title);
+  if (BAD_TITLE.test(title) || (avoid && avoid.test(title))) return Number.NEGATIVE_INFINITY;
   const q = query.toLowerCase();
   const words = q.split(/\s+/).filter((w) => w.length > 2);
 
@@ -126,9 +163,6 @@ function scoreCandidate(candidate, query, avoid) {
   for (const word of words) {
     if (title.includes(word)) score += 3;
   }
-  if (BAD_TITLE.test(title)) score -= 14;
-  if (avoid && avoid.test(title)) score -= 14;
-
   const w = candidate.width || 0;
   const h = candidate.height || 0;
   if (w > h) score += 2; // landscape suits the dish cards
@@ -172,6 +206,7 @@ async function searchCommons(query, limit = 10) {
       return {
         title: page.title,
         url: info.thumburl || info.url,
+        originalUrl: info.url,
         width: info.thumbwidth || info.width,
         height: info.thumbheight || info.height,
         license: info.extmetadata?.LicenseShortName?.value,
@@ -198,6 +233,7 @@ async function searchOpenverse(query, limit = 10) {
     .map((item) => ({
       title: item.title || '',
       url: item.thumbnail || item.url,
+      originalUrl: item.url,
       width: item.width,
       height: item.height,
       license: item.license ? `${item.license.toUpperCase()} ${item.license_version || ''}`.trim() : undefined,
@@ -208,7 +244,7 @@ async function searchOpenverse(query, limit = 10) {
 }
 
 async function pickBest(query, avoid) {
-  for (const search of [searchCommons, searchOpenverse]) {
+  for (const search of [searchOpenverse, searchCommons]) {
     try {
       const candidates = await search(query);
       await sleep(REQUEST_DELAY_MS);
@@ -237,6 +273,19 @@ async function downloadImage(url, absolutePath, maxWidth) {
     .toFile(absolutePath);
 
   return fs.statSync(absolutePath).size;
+}
+
+async function downloadCandidate(candidate, absolutePath, maxWidth) {
+  const urls = [...new Set([candidate.url, candidate.originalUrl].filter(Boolean))];
+  let lastError;
+  for (const url of urls) {
+    try {
+      return await downloadImage(url, absolutePath, maxWidth);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError ?? new Error('No image URL was available');
 }
 
 function sanitizeMarkdown(value) {
@@ -270,8 +319,17 @@ async function main() {
   let processed = 0;
   let created = 0;
   const credits = [];
+  const targetsToProcess = FILE_FILTER
+    ? TARGETS.filter((target) => FILE_FILTER.has(target.file))
+    : TARGETS;
 
-  for (const target of TARGETS) {
+  if (FILE_FILTER && targetsToProcess.length !== FILE_FILTER.size) {
+    const knownFiles = new Set(TARGETS.map((target) => target.file));
+    const unknownFiles = [...FILE_FILTER].filter((file) => !knownFiles.has(file));
+    throw new Error(`Unknown image target(s): ${unknownFiles.join(', ') || 'duplicate target names'}`);
+  }
+
+  for (const target of targetsToProcess) {
     if (processed >= LIMIT) break;
 
     const targetDir = path.join(IMAGES_DIR, target.dir);
@@ -279,7 +337,12 @@ async function main() {
     const absolutePath = path.join(targetDir, `${target.file}.webp`);
 
     if (fs.existsSync(absolutePath) && !FORCE) {
-      continue;
+      const existingBytes = fs.statSync(absolutePath).size;
+      const isSmallDishPlaceholder =
+        REPLACE_SMALL &&
+        target.dir === 'dishes' &&
+        existingBytes <= SMALL_DISH_IMAGE_BYTES;
+      if (!isSmallDishPlaceholder) continue;
     }
 
     processed += 1;
@@ -292,7 +355,7 @@ async function main() {
     }
 
     try {
-      const bytes = await downloadImage(chosen.url, absolutePath, target.width);
+      const bytes = await downloadCandidate(chosen, absolutePath, target.width);
       created += 1;
       console.log(
         `  ✓ ${chosen.source}: ${sanitizeMarkdown(chosen.title).slice(0, 60)} (${Math.round(bytes / 1024)} KB)`
@@ -339,7 +402,9 @@ async function main() {
     fs.writeFileSync(CREDITS_PATH, `${header}\n${rows}\n`, 'utf8');
   }
 
-  console.log(`\nDone. processed=${processed} created=${created} remainingTargets=${TARGETS.length}`);
+  console.log(
+    `\nDone. processed=${processed} created=${created} remainingTargets=${targetsToProcess.length}`
+  );
 }
 
 main().catch((error) => {

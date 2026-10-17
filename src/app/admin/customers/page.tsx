@@ -77,86 +77,50 @@ export default function AdminCustomersPage() {
 
   const downloadExcel = () => {
     const workbook = XLSX.utils.book_new();
-    const customerRows = customers.map((customer) => ({
-      'Customer ID': customer.id,
-      Name: customer.name,
-      Email: customer.email,
-      Phone: customer.phone ?? '',
-      'Joined At': new Date(customer.createdAt),
-      'Order Count': customer.orders.length,
-      'Recorded Order Value (INR)': customer.orders.reduce(
-        (total, order) => total + order.total,
-        0
-      ),
-    }));
-    const orderRows = customers.flatMap((customer) =>
-      customer.orders.map((order) => ({
-        'Customer ID': customer.id,
-        'Customer Name': customer.name,
-        'Customer Email': customer.email,
-        'Order ID': order.id,
-        'Order Date': new Date(order.createdAt),
-        Status: order.status,
-        'Payment Method': order.paymentMethod,
-        Branch: order.branch?.name ?? '',
-        'Subtotal (INR)': order.subtotal,
-        'Delivery Fee (INR)': order.deliveryFee,
-        'Discount (INR)': order.discount,
-        'Total (INR)': order.total,
-      }))
-    );
-    const itemRows = customers.flatMap((customer) =>
-      customer.orders.flatMap((order) =>
-        order.items.map((item) => ({
-          'Customer Name': customer.name,
-          'Customer Email': customer.email,
-          'Order ID': order.id,
-          'Order Date': new Date(order.createdAt),
-          'Item Name': item.name,
-          Quantity: item.quantity,
-          'Unit Price (INR)': item.unitPrice,
-          'Line Total (INR)': item.total,
-        }))
-      )
-    );
-
-    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(customerRows), 'Customers');
-    XLSX.utils.book_append_sheet(
-      workbook,
-      XLSX.utils.json_to_sheet(orderRows, {
-        header: [
-          'Customer ID',
-          'Customer Name',
-          'Customer Email',
-          'Order ID',
-          'Order Date',
-          'Status',
-          'Payment Method',
-          'Branch',
-          'Subtotal (INR)',
-          'Delivery Fee (INR)',
-          'Discount (INR)',
-          'Total (INR)',
-        ],
-      }),
-      'Orders'
-    );
-    XLSX.utils.book_append_sheet(
-      workbook,
-      XLSX.utils.json_to_sheet(itemRows, {
-        header: [
-          'Customer Name',
-          'Customer Email',
-          'Order ID',
-          'Order Date',
-          'Item Name',
-          'Quantity',
-          'Unit Price (INR)',
-          'Line Total (INR)',
-        ],
-      }),
-      'Order Items'
-    );
+    const headers = [
+      'Customer Name',
+      'Email',
+      'Phone',
+      'Joined',
+      'Orders',
+      'Total Spent (INR)',
+      'Latest Order',
+      'Latest Order Status',
+    ];
+    const rows = filteredCustomers.map((customer) => {
+      const latestOrder = customer.orders[0];
+      return [
+        customer.name,
+        customer.email,
+        customer.phone ?? '',
+        new Date(customer.createdAt),
+        customer.orders.length,
+        customer.orders.reduce((total, order) => total + order.total, 0),
+        latestOrder ? new Date(latestOrder.createdAt) : '',
+        latestOrder ? latestOrder.status.replaceAll('_', ' ') : 'No orders',
+      ];
+    });
+    const sheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    sheet['!cols'] = [
+      { wch: 24 },
+      { wch: 32 },
+      { wch: 18 },
+      { wch: 16 },
+      { wch: 10 },
+      { wch: 20 },
+      { wch: 16 },
+      { wch: 28 },
+    ];
+    sheet['!autofilter'] = { ref: `A1:H${Math.max(rows.length + 1, 1)}` };
+    for (let row = 2; row <= rows.length + 1; row += 1) {
+      for (const column of ['D', 'G']) {
+        const cell = sheet[`${column}${row}`];
+        if (cell?.t === 'd') cell.z = 'dd mmm yyyy';
+      }
+      const amountCell = sheet[`F${row}`];
+      if (amountCell) amountCell.z = '₹#,##0';
+    }
+    XLSX.utils.book_append_sheet(workbook, sheet, 'Customers');
 
     const file = new Blob([XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })], {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -164,7 +128,7 @@ export default function AdminCustomersPage() {
     const downloadUrl = URL.createObjectURL(file);
     const link = document.createElement('a');
     link.href = downloadUrl;
-    link.download = `snack-pod-customer-data-${new Date().toISOString().slice(0, 10)}.xlsx`;
+    link.download = `snack-pod-customers-${new Date().toISOString().slice(0, 10)}.xlsx`;
     link.click();
     window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
   };
@@ -185,7 +149,8 @@ export default function AdminCustomersPage() {
           <button
             type="button"
             onClick={downloadExcel}
-            disabled={loading || customers.length === 0}
+            disabled={loading || filteredCustomers.length === 0}
+            title={`Download ${filteredCustomers.length} customer records${query ? ' matching your search' : ''}`}
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Download className="h-4 w-4" aria-hidden="true" />

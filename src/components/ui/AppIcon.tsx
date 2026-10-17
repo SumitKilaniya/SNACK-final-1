@@ -4,6 +4,7 @@ import React from 'react';
 import * as HeroIcons from '@heroicons/react/24/outline';
 import * as HeroIconsSolid from '@heroicons/react/24/solid';
 import { QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
+import * as LucideIcons from 'lucide-react';
 
 type IconVariant = 'outline' | 'solid';
 
@@ -27,7 +28,13 @@ function Icon({
   ...props
 }: IconProps) {
   const iconSet = variant === 'solid' ? HeroIconsSolid : HeroIcons;
-  const IconComponent = iconSet[name as keyof typeof iconSet] as React.ComponentType<any>;
+  const HeroIconComponent = iconSet[name as keyof typeof iconSet] as
+    | React.ComponentType<any>
+    | undefined;
+  const LucideIconComponent = LucideIcons[name as keyof typeof LucideIcons] as
+    | React.ComponentType<any>
+    | undefined;
+  const IconComponent = HeroIconComponent ?? LucideIconComponent;
 
   if (!IconComponent) {
     return (

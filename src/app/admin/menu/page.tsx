@@ -414,14 +414,14 @@ export default function AdminMenuPage() {
   const selectedBranchName = branches.find((b) => b.id === effectiveBranchId)?.name || '';
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-4 sm:space-y-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs">
         <div>
           <span className="text-xs font-bold text-primary tracking-wider uppercase bg-primary/10 px-2.5 py-1 rounded-full">
             Menu Management
           </span>
-          <h1 className="text-2xl font-black text-slate-900 mt-1">
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 mt-1">
             {view === 'catalog' ? 'Master Catalog' : 'Branch Overrides'}
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -431,11 +431,11 @@ export default function AdminMenuPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           {view === 'catalog' && isSuperAdmin && (
             <button
               onClick={openAddModal}
-              className="px-4 py-2.5 bg-primary text-primary-foreground font-extrabold text-sm rounded-xl hover:bg-primary/90 transition-all shadow-md shadow-primary/20 flex items-center gap-2"
+              className="w-full sm:w-auto justify-center px-4 py-2.5 bg-primary text-primary-foreground font-extrabold text-sm rounded-xl hover:bg-primary/90 transition-all shadow-md shadow-primary/20 flex items-center gap-2"
             >
               <Icon name="Plus" className="w-4 h-4" /> Add New Dish
             </button>
@@ -447,7 +447,7 @@ export default function AdminMenuPage() {
       <div className="bg-white p-1 rounded-2xl border border-slate-200 shadow-xs flex gap-1">
         <button
           onClick={() => setView('catalog')}
-          className={`flex-1 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+          className={`flex-1 px-2 sm:px-4 py-2.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all ${
             view === 'catalog'
               ? 'bg-slate-900 text-white shadow-sm'
               : 'text-slate-600 hover:bg-slate-100'
@@ -458,7 +458,7 @@ export default function AdminMenuPage() {
         </button>
         <button
           onClick={() => setView('overrides')}
-          className={`flex-1 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+          className={`flex-1 px-2 sm:px-4 py-2.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all ${
             view === 'overrides'
               ? 'bg-slate-900 text-white shadow-sm'
               : 'text-slate-600 hover:bg-slate-100'
@@ -489,7 +489,7 @@ export default function AdminMenuPage() {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none focus:border-primary"
+                className="w-full sm:w-auto min-w-0 flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none focus:border-primary"
               >
                 <option value="all">All Categories ({items.length})</option>
                 {CATEGORY_OPTIONS.map((c) => (
@@ -502,7 +502,7 @@ export default function AdminMenuPage() {
               <select
                 value={stockFilter}
                 onChange={(e) => setStockFilter(e.target.value as 'all' | 'instock' | 'outOfStock')}
-                className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none focus:border-primary"
+                className="w-full sm:w-auto min-w-0 flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none focus:border-primary"
               >
                 <option value="all">Stock: All</option>
                 <option value="instock">In Stock Only</option>
@@ -530,7 +530,8 @@ export default function AdminMenuPage() {
                 </button>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <>
+              <div className="hidden 2xl:block overflow-x-auto">
                 <table className="w-full text-left text-xs text-slate-700">
                   <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
                     <tr>
@@ -672,6 +673,112 @@ export default function AdminMenuPage() {
                   </tbody>
                 </table>
               </div>
+              <div className="2xl:hidden p-3 sm:p-4 space-y-3">
+                {filteredItems.length === 0 ? (
+                  <div className="py-8 text-center">
+                    <Icon name="Utensils" className="w-10 h-10 mx-auto text-slate-300 mb-2" />
+                    <p className="font-semibold text-slate-600 text-sm">No dishes match your filters.</p>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Try adjusting search or add a new dish.
+                    </p>
+                  </div>
+                ) : (
+                  filteredItems.map((item) => {
+                    const categoryName =
+                      CATEGORY_OPTIONS.find((category) => category.id === item.category)?.name ||
+                      item.category;
+                    return (
+                      <article
+                        key={item.id}
+                        className={`rounded-xl border border-slate-200 p-3 ${
+                          item.isAvailable ? 'bg-white' : 'bg-slate-50 opacity-80'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+                            <AppImage
+                              src={item.imageUrl || '/images/dishes/dish_48.webp'}
+                              alt={item.name}
+                              fill
+                              className={`object-cover ${!item.isAvailable ? 'grayscale' : ''}`}
+                              sizes="56px"
+                            />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-start justify-between gap-2">
+                              <h2 className="font-bold text-sm text-slate-900 break-words">
+                                {item.name}
+                              </h2>
+                              <span
+                                className={`shrink-0 px-2 py-1 rounded-lg text-[10px] font-bold border ${
+                                  item.isAvailable
+                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                    : 'bg-slate-100 text-slate-500 border-slate-200'
+                                }`}
+                              >
+                                {item.isAvailable ? 'In Stock' : 'Out of Stock'}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-500 line-clamp-2 mt-0.5">
+                              {item.description || 'No description provided.'}
+                            </p>
+                            <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                              <span className="bg-slate-100 text-slate-700 px-2 py-1 rounded-lg text-[10px] font-bold">
+                                {categoryName}
+                              </span>
+                              <span className="text-[10px] font-bold text-slate-700">
+                                {item.isVeg ? '🟢 Veg' : '🔴 Non-Veg'}
+                              </span>
+                              {item.isBestseller && (
+                                <span className="bg-amber-100 text-amber-800 font-bold text-[10px] px-2 py-1 rounded">
+                                  ★ Bestseller
+                                </span>
+                              )}
+                              {item.badge && (
+                                <span className="bg-primary/10 text-primary font-bold text-[10px] px-2 py-1 rounded">
+                                  {item.badge}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex flex-wrap items-center justify-between gap-2 mt-3 pt-3 border-t border-slate-100">
+                              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                <span className="font-extrabold text-slate-900 text-sm">
+                                  ₹{item.basePrice}
+                                </span>
+                                <span className="text-xs text-amber-600 font-bold">
+                                  ★ {item.rating.toFixed(1)}
+                                  <span className="text-slate-400 font-medium">
+                                    {' '}· {item.reviewCount} reviews
+                                  </span>
+                                </span>
+                              </div>
+                              {isSuperAdmin && (
+                                <div className="flex items-center gap-1">
+                                  <button
+                                    onClick={() => openEditModal(item)}
+                                    className="min-w-10 min-h-10 flex items-center justify-center text-slate-600 hover:text-primary hover:bg-slate-100 rounded-lg"
+                                    aria-label={`Edit ${item.name}`}
+                                  >
+                                    <Icon name="Pencil" className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => setDeleteConfirmItem(item)}
+                                    className="min-w-10 min-h-10 flex items-center justify-center text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                                    aria-label={`Delete ${item.name}`}
+                                  >
+                                    <Icon name="Trash2" className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })
+                )}
+              </div>
+              </>
             )}
           </div>
         </>
@@ -681,7 +788,7 @@ export default function AdminMenuPage() {
       {view === 'overrides' && (
         <>
           {/* Branch Selector */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4">
+          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
             <div className="flex items-center gap-2">
               <Icon name="Store" className="w-4 h-4 text-slate-500" />
               <span className="text-xs font-bold text-slate-700">Branch:</span>
@@ -690,7 +797,7 @@ export default function AdminMenuPage() {
               <select
                 value={selectedBranchId}
                 onChange={(e) => setSelectedBranchId(e.target.value)}
-                className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-primary"
+                className="w-full sm:w-auto min-w-0 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-primary"
               >
                 {branches.map((b) => (
                   <option key={b.id} value={b.id}>
@@ -711,7 +818,8 @@ export default function AdminMenuPage() {
                 <span className="ml-3 text-xs font-semibold text-slate-500">Loading branch menu...</span>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <>
+              <div className="hidden 2xl:block overflow-x-auto">
                 <table className="w-full text-left text-xs text-slate-700">
                   <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
                     <tr>
@@ -867,6 +975,148 @@ export default function AdminMenuPage() {
                   </tbody>
                 </table>
               </div>
+              <div className="2xl:hidden p-3 sm:p-4 space-y-3">
+                {overrideItems.length === 0 ? (
+                  <div className="py-8 text-center">
+                    <Icon name="Store" className="w-10 h-10 mx-auto text-slate-300 mb-2" />
+                    <p className="font-semibold text-slate-600 text-sm">
+                      No menu items available for this branch.
+                    </p>
+                  </div>
+                ) : (
+                  overrideItems.map((item) => {
+                    const hasOverride = item.priceOverridden ?? false;
+                    const effectivePrice = item.price ?? item.basePrice;
+                    return (
+                      <article
+                        key={item.id}
+                        className={`rounded-xl border border-slate-200 p-3 ${
+                          overrideSaving[item.id] ? 'opacity-60' : 'bg-white'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
+                            <AppImage
+                              src={item.imageUrl || '/images/dishes/dish_48.webp'}
+                              alt={item.name}
+                              fill
+                              className="object-cover"
+                              sizes="48px"
+                            />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h2 className="font-bold text-sm text-slate-900 break-words">
+                              {item.name}
+                            </h2>
+                            {item.description && (
+                              <p className="text-[10px] text-slate-500 line-clamp-2 mt-0.5">
+                                {item.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 mt-3 py-3 border-y border-slate-100">
+                          <div>
+                            <p className="text-[10px] font-semibold text-slate-500">Base price</p>
+                            <p className="font-bold text-sm text-slate-800">₹{item.basePrice}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-semibold text-slate-500">Branch price</p>
+                            <div className="flex items-center gap-1.5">
+                              <p className="font-extrabold text-sm text-slate-900">
+                                ₹{effectivePrice}
+                              </p>
+                              {hasOverride && (
+                                <span className="text-[9px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                                  OVERRIDE
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap items-end gap-2 py-3">
+                          <label className="flex-1 min-w-[140px]">
+                            <span className="block text-[10px] font-bold text-slate-600 mb-1">
+                              Set branch price
+                            </span>
+                            <div className="relative">
+                              <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-bold">
+                                ₹
+                              </span>
+                              <input
+                                type="number"
+                                min={0}
+                                value={item.priceOverridden ? (item.price ?? '') : ''}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setOverrideItems((prev) =>
+                                    prev.map((it) =>
+                                      it.id === item.id
+                                        ? {
+                                            ...it,
+                                            priceOverridden: val !== '',
+                                            price: val === '' ? it.basePrice : Number(val),
+                                          }
+                                        : it
+                                    )
+                                  );
+                                }}
+                                onBlur={(e) => handleOverridePrice(item.id, e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    handleOverridePrice(
+                                      item.id,
+                                      (e.target as HTMLInputElement).value
+                                    );
+                                  }
+                                }}
+                                placeholder={String(item.basePrice)}
+                                aria-label={`Branch price for ${item.name}`}
+                                className="w-full pl-7 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-slate-900 outline-none focus:border-primary"
+                              />
+                            </div>
+                          </label>
+                          {hasOverride && (
+                            <button
+                              onClick={() => handleResetToBasePrice(item.id)}
+                              className="px-3 py-2 min-h-10 text-[11px] font-bold text-slate-600 hover:text-primary bg-slate-100 hover:bg-primary/10 rounded-lg"
+                              title="Clear override and use base price"
+                            >
+                              Reset
+                            </button>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <button
+                            onClick={() => handleOverrideAvailability(item)}
+                            disabled={overrideSaving[item.id]}
+                            className={`min-h-10 px-3 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 border ${
+                              item.isAvailable
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                : 'bg-slate-100 text-slate-700 border-slate-200'
+                            }`}
+                          >
+                            <span
+                              className={`w-2 h-2 rounded-full ${
+                                item.isAvailable ? 'bg-emerald-500' : 'bg-slate-500'
+                              }`}
+                            />
+                            {item.isAvailable ? 'Available' : 'Unavailable'}
+                          </button>
+                          {overrideSaving[item.id] ? (
+                            <span className="text-[10px] text-slate-400 font-medium">Saving…</span>
+                          ) : hasOverride ? (
+                            <span className="text-[10px] text-emerald-600 font-bold">Override saved</span>
+                          ) : (
+                            <span className="text-[10px] text-slate-400">Using base settings</span>
+                          )}
+                        </div>
+                      </article>
+                    );
+                  })
+                )}
+              </div>
+              </>
             )}
           </div>
         </>
@@ -874,8 +1124,8 @@ export default function AdminMenuPage() {
 
       {/* ── Add / Edit Dish Modal ───────────────────────────────────── */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-lg w-full border border-slate-200 shadow-2xl p-6 relative animate-in fade-in zoom-in-95 duration-150 my-8">
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100vh-2rem)] overflow-y-auto border border-slate-200 shadow-2xl p-4 sm:p-6 relative animate-in fade-in zoom-in-95 duration-150 my-auto sm:my-8">
             <button
               onClick={() => setIsModalOpen(false)}
               className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 rounded-lg"

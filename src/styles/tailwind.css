@@ -329,6 +329,15 @@
       animation: none !important;
     }
   }
+
+  @media (max-width: 639px) {
+    .hero-dish-spin,
+    .hero-dish-glare,
+    .hero-dish-shadow,
+    .hero-ring {
+      animation: none !important;
+    }
+  }
 }
 
 @keyframes marquee {

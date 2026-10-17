@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AdminProvider, useAdmin } from '@/lib/admin-context';
@@ -36,29 +36,47 @@ function AdminShell({ children }: { children: React.ReactNode }) {
     isSuperAdmin ? true : item.roles.includes('BRANCH_ADMIN')
   );
 
+  useEffect(() => {
+    if (!sidebarOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSidebarOpen(false);
+    };
+
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [sidebarOpen]);
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       {/* ── Top Bar ─────────────────────────────────────────────── */}
-      <header className="bg-slate-900 text-white sticky top-0 z-40 border-b border-slate-800 px-4 py-2.5 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3">
+      <header className="bg-slate-900 text-white sticky top-0 z-40 border-b border-slate-800 px-3 sm:px-4 py-2.5 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:hidden p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800"
-            aria-label="Toggle Navigation"
+            onClick={() => setSidebarOpen((open) => !open)}
+            className="lg:hidden w-10 h-10 shrink-0 flex items-center justify-center rounded-lg text-slate-300 hover:text-white hover:bg-slate-800"
+            aria-label={sidebarOpen ? 'Close navigation' : 'Open navigation'}
+            aria-expanded={sidebarOpen}
+            aria-controls="admin-navigation"
           >
-            <Icon name="Menu" className="w-5 h-5" />
+            <Icon name={sidebarOpen ? 'X' : 'Menu'} className="w-5 h-5" />
           </button>
 
-          <Link href="/admin" className="flex items-center gap-2">
-            <AppLogo />
-            <span className="bg-primary/20 text-primary-foreground border border-primary/30 text-[10px] font-bold px-2 py-0.5 rounded tracking-wide uppercase">
-              Admin Portal
+          <Link href="/admin" className="flex items-center gap-2 min-w-0">
+            <AppLogo size={32} />
+            <span className="bg-primary/20 text-primary-foreground border border-primary/30 text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded tracking-wide uppercase whitespace-nowrap">
+              Admin<span className="hidden sm:inline"> Portal</span>
             </span>
           </Link>
         </div>
 
         {/* Right Control Strip */}
-        <div className="flex items-center gap-3 text-xs">
+        <div className="flex items-center gap-2 sm:gap-3 text-xs shrink-0">
           <div className="hidden sm:flex items-center gap-1.5 bg-slate-800/90 border border-slate-700/80 px-2.5 py-1 rounded-lg">
             <span className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
               <Icon name="ShieldCheck" className="w-3.5 h-3.5 text-primary" />{' '}
@@ -83,7 +101,8 @@ function AdminShell({ children }: { children: React.ReactNode }) {
             <button
               onClick={() => signOut()}
               title="Sign Out"
-              className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors"
+              aria-label="Sign Out"
+              className="w-10 h-10 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors"
             >
               <Icon name="LogOut" className="w-4 h-4" />
             </button>
@@ -94,14 +113,17 @@ function AdminShell({ children }: { children: React.ReactNode }) {
       {/* ── Main Workspace Body ───────────────────────────────────── */}
       <div className="flex flex-1 relative">
         {sidebarOpen && (
-          <div
+          <button
+            type="button"
             onClick={() => setSidebarOpen(false)}
+            aria-label="Close navigation"
             className="fixed inset-0 bg-slate-950/60 z-20 lg:hidden backdrop-blur-xs"
           />
         )}
 
         <aside
-          className={`fixed lg:sticky top-[49px] left-0 h-[calc(100vh-49px)] w-64 bg-slate-900 text-slate-300 border-r border-slate-800 z-30 flex flex-col transition-transform duration-200 shrink-0 ${
+          id="admin-navigation"
+          className={`fixed lg:sticky top-[61px] lg:top-[49px] left-0 h-[calc(100dvh-61px)] lg:h-[calc(100vh-49px)] w-[min(18rem,88vw)] bg-slate-900 text-slate-300 border-r border-slate-800 z-30 flex flex-col transition-transform duration-200 shrink-0 ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
           }`}
         >
@@ -147,7 +169,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
         </aside>
 
-        <main className="flex-1 p-4 sm:p-6 md:p-8 min-w-0 overflow-x-hidden">{children}</main>
+        <main className="flex-1 p-3 sm:p-6 md:p-8 min-w-0 overflow-x-hidden">{children}</main>
       </div>
     </div>
   );

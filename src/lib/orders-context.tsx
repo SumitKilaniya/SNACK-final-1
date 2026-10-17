@@ -2,6 +2,7 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import * as api from './api-client';
+import { useAuth } from './auth-context';
 import type { OrderListItem } from './order-types';
 
 /**
@@ -35,42 +36,60 @@ interface OrdersContextValue {
 const OrdersContext = createContext<OrdersContextValue | undefined>(undefined);
 
 export function OrdersProvider({ children }: { children: React.ReactNode }) {
+  const { isLoggedIn, isLoading: authLoading } = useAuth();
   const [orders, setOrders] = useState<OrderListItem[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const fetchedRef = useRef(false);
+  const requestRef = useRef(0);
 
   const load = useCallback(async (opts: { silent?: boolean } = {}) => {
+    const requestId = ++requestRef.current;
     if (!opts.silent) setIsLoading(true);
     setError(null);
     try {
       const data = await api.authenticatedFetch<{ orders: OrderListItem[] }>('/api/orders');
+      if (requestId !== requestRef.current) return;
       setOrders(data.orders);
     } catch (e) {
+      if (requestId !== requestRef.current) return;
       // Session-expired 401s are handled by the auth layer (signed-out UI);
       // anything else surfaces as a retryable load error.
       setError(e instanceof Error ? e.message : "Couldn't load your orders.");
     } finally {
-      setIsLoading(false);
-      setIsHydrated(true);
+      if (requestId === requestRef.current) {
+        setIsLoading(false);
+        setIsHydrated(true);
+      }
     }
   }, []);
 
-  // Fetch once on mount (authenticated via the refresh-cookie session).
+  // Wait for session hydration and fetch again whenever a customer signs in.
   useEffect(() => {
+    if (authLoading) return;
+    if (!isLoggedIn) {
+      requestRef.current += 1;
+      fetchedRef.current = false;
+      setOrders([]);
+      setError(null);
+      setIsLoading(false);
+      setIsHydrated(true);
+      return;
+    }
     if (fetchedRef.current) return;
     fetchedRef.current = true;
     void load();
-  }, [load]);
+  }, [authLoading, isLoggedIn, load]);
 
   const retry = useCallback(() => {
     void load();
   }, [load]);
 
   const refresh = useCallback(async () => {
+    if (!isLoggedIn) return;
     await load({ silent: true });
-  }, [load]);
+  }, [isLoggedIn, load]);
 
   const value = useMemo<OrdersContextValue>(
     () => ({ orders, isHydrated, isLoading, error, retry, refresh }),

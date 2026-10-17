@@ -13,6 +13,7 @@ import { ToastProvider } from '@/lib/toast-context';
 import { WishlistProvider } from '@/lib/wishlist-context';
 import GlobalFloatingCart from '@/app/menu/components/FloatingCart';
 import CartDrawer from '@/components/CartDrawer';
+import FloatingOrderTracker from '@/components/FloatingOrderTracker';
 
 export default function AppProviders({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -33,6 +34,7 @@ export default function AppProviders({ children }: { children: React.ReactNode }
                     <WishlistProvider>
                       {children}
                       <GlobalFloatingCart />
+                      <FloatingOrderTracker />
                       <CartDrawer />
                     </WishlistProvider>
                   </CartProvider>
