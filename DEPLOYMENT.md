@@ -1,176 +1,174 @@
-# Snack-Pod — Deployment & Monitoring Guide (Phase 14)
+# Production deployment — Hostinger Cloud
 
-This document is the operational manual for taking the app live. Everything
-referenced here exists in the repo; the only steps you must do yourself are the
-ones that need a real account/key (marked **YOU**).
+Snack-Pod is a long-running Next.js 15 Node.js application with a PostgreSQL
+database. Hostinger Cloud plans and hPanel features vary: continue with this
+guide only if your hPanel lets you create a **Node.js application**. If that
+option is not available on your plan, deploy this repository to a Hostinger
+VPS instead. Do not upload this project as a static site or PHP application.
 
----
+## 1. Services and prerequisites
 
-## 1. Deploy targets
+Before connecting the app to your public domain, provision:
 
-**Freebuff-managed hosting (recommended, zero-ops):** the Deploy button builds
-with Next.js framework defaults (`next build`) and serves over HTTPS
-automatically. After your first deploy you can redeploy with
-`freebuff-deploy start`; watch errors with `freebuff-deploy status | logs`.
+- A Hostinger Cloud Node.js application with Node.js **22.x**.
+- A managed PostgreSQL database, for example Neon or Supabase. Hostinger's
+  MySQL database is not compatible with this Prisma schema or migration
+  history. Use the provider's PostgreSQL connection string and allow access
+  from the Hostinger app.
+- A domain with HTTPS enabled in Hostinger.
+- Resend for account/password-reset and order email, and Twilio for phone OTP.
+  These delivery integrations must be configured before accepting real users.
+- Optional live Stripe credentials and a webhook endpoint if enabling card
+  payments. Cash on delivery does not require Stripe.
 
-**Self-host (VPS / Render / Railway):** the repo ships a `Dockerfile`
-(`docker build -t snackpod . && docker run -p 3000:3000 ...`), a
-`docker-compose.yml` (app + Postgres + Redis for a local production-like test),
-and a GitHub Actions pipeline that pushes a Docker image to GHCR on every merge
-to `main` (`.github/workflows/deploy.yml`).
+The committed Prisma migrations are PostgreSQL migrations. Do not change the
+schema provider, run `prisma db push`, or run the development seed against the
+production database.
 
----
+## 2. Configure the Hostinger Node.js application
 
-## 2. Database — managed Postgres (**YOU**)
+Connect the Git repository in hPanel and configure the application root to the
+repository root. Use these commands (or the equivalent custom build/start
+fields in your hPanel):
 
-The repo runs SQLite in dev for zero-setup. Production uses a managed Postgres.
+```sh
+corepack enable
+corepack prepare pnpm@11.18.0 --activate
+pnpm install --frozen-lockfile
+pnpm run build
+pnpm run start
+```
 
-1. Provision a Postgres instance — **Neon** is recommended (serverless,
-   generous free tier, point-in-time backups + encryption at rest on by
-   default). [Create a Neon project → Connection Details](https://index.trygravity.ai/go/661b6f80-9049-4c32-9987-c54eda2de627)
-   (Supabase is a fine alternative).
-2. Copy the connection string (use the **pooled** one for serverless).
-3. Switch the datasource provider (one line) and regenerate Postgres migrations:
+`pnpm run start` listens on `0.0.0.0` and respects Hostinger's assigned `PORT`.
+Do not run `next dev` in production. Build with all dependencies installed;
+the Prisma CLI is a production dependency because deployments apply migrations.
 
-   ```diff
-   - provider = "sqlite"
-   + provider = "postgresql"
+Add the environment variables in the Hostinger app's environment/secret
+settings, not in source control. Ensure `NEXT_PUBLIC_SITE_URL` is available
+during the build because Next.js uses it for generated metadata. Set the same
+values for the running app:
+
+| Variable | Required value |
+| --- | --- |
+| `NODE_ENV` | `production` |
+| `APP_ORIGIN` | HTTPS origin, e.g. `https://snackpod.example` (no trailing slash/path) |
+| `NEXT_PUBLIC_SITE_URL` | The public HTTPS origin, e.g. `https://snackpod.example` |
+| `DATABASE_URL` | PostgreSQL connection string for the production database |
+| `JWT_ACCESS_SECRET` | Unique random secret, at least 32 characters |
+| `JWT_RESET_SECRET` | A different unique random secret, at least 32 characters |
+| `EMAIL_PROVIDER` | `resend` |
+| `RESEND_API_KEY` | Resend production API key |
+| `RESEND_FROM` | Verified sender, e.g. `Snack-Pod <orders@yourdomain>` |
+| `SMS_PROVIDER` | `twilio` |
+| `TWILIO_ACCOUNT_SID` | Twilio account SID |
+| `TWILIO_AUTH_TOKEN` | Twilio auth token |
+| `TWILIO_FROM` or `TWILIO_PHONE_NUMBER` | Twilio-enabled sender number |
+
+Generate each JWT secret independently. For example, run this twice in a
+trusted terminal and store the two outputs directly in Hostinger's secret
+settings:
+
+```sh
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Do not use the development credentials in `.env.example`, commit live keys, or
+reuse the same secrets across environments. Startup refuses to serve production
+with missing/weak JWT secrets, non-PostgreSQL database URLs, non-HTTPS public
+origins, or an unreachable database. HTTP is allowed only for localhost in
+local development.
+
+Optional integrations:
+
+- **Google OAuth:** set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and
+  `NEXT_PUBLIC_GOOGLE_CLIENT_ID`; register
+  `https://your-domain/api/auth/google/callback` as the OAuth redirect URI.
+- **Stripe:** set `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
+  `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, and `STRIPE_CURRENCY`. Register
+  `https://your-domain/api/payments/stripe/webhook` for the required payment
+  events in Stripe. Use live credentials only after completing Stripe's
+  account and payment-flow verification.
+- **reCAPTCHA:** set `RECAPTCHA_SECRET` and
+  `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` together to enable CAPTCHA after repeated
+  failed sign-in attempts.
+- **Monitoring/rate limits:** set `SENTRY_DSN` for error monitoring. Redis is
+  optional for a single app instance; configure `REDIS_URL` if running multiple
+  instances so rate limits are shared.
+
+## 3. Apply database migrations and create the first administrator
+
+After configuring the Hostinger environment and before opening the site:
+
+1. Open the Node.js app's terminal in hPanel.
+2. Run `pnpm run db:migrate:deploy`. This applies only checked-in migrations;
+   if it fails, stop and correct the database connection/migration issue.
+3. Create the first super-admin exactly once. Pass a unique email, name, and
+   strong password as temporary terminal environment variables:
+
+   ```sh
+   NODE_ENV=production ADMIN_EMAIL=admin@yourdomain \
+     ADMIN_NAME="Snack-Pod Admin" ADMIN_PASSWORD='use-a-unique-strong-password' \
+     pnpm run admin:create:super-admin
    ```
-   ```bash
-   bunx prisma migrate dev --name init_postgres   # once, against the prod DB
-   bunx prisma db seed
-   ```
-4. Set the production env var: `DATABASE_URL=postgresql://...` (in Freebuff:
-   `freebuff-deploy env set '{"DATABASE_URL":"..."}'`, or your host's env UI).
-   Apply schema changes on deploy with `prisma migrate deploy` (the Docker
-   entrypoint already does this, falling back to `db push` on a fresh DB).
 
-Least-privilege: create a dedicated app role that owns only this schema
-(no `DROP DATABASE` / access to other databases) and connect with that role.
+   The command refuses to overwrite an existing account. Remove the temporary
+   `ADMIN_PASSWORD` value from the terminal/session after it succeeds.
+4. Do **not** run `pnpm exec prisma db seed` in production. The seed creates
+   publicly documented development accounts and sample data; it exits without
+   running when `NODE_ENV=production`.
 
----
+## 4. Deploy and verify
 
-## 3. HTTPS
+Deploy the built Node.js app, attach the domain, enable HTTPS, then verify:
 
-- **Freebuff hosting / Vercel / Render / Railway:** TLS is automatic on the
-  platform's `https://` domain — nothing to configure.
-- **Self-managed VPS:** run Nginx in front of the app container and use
-  certbot (`certbot --nginx -d yourdomain.com`), which installs Let's Encrypt
-  certs and auto-renews. The app itself must only listen on localhost behind
-  Nginx.
+1. `https://your-domain/api/health` returns HTTP 200 and `"db":"up"`.
+2. Sign in using the newly provisioned super-admin account.
+3. Register a test customer and verify the Twilio OTP arrives.
+4. Request a password reset and verify the email arrives.
+5. Place a test cash-on-delivery order and verify customer/admin order views.
+6. If Stripe is enabled, use Stripe test mode first and verify the webhook
+   changes payment status; use live mode only after successful testing.
+7. Check Hostinger logs for startup errors. Configure a public uptime monitor
+   for `/api/health` and ensure it alerts on failure.
 
----
+The app health route returns 503 if PostgreSQL is unavailable. Back up the
+PostgreSQL database before deploying schema changes and enable the database
+provider's automated backups/point-in-time recovery. Apply additive migrations
+before shifting live traffic to code that depends on them.
 
-## 4. Redis — optional, opt-in (**YOU**, only if multi-instance)
+## 5. Release checks
 
-Rate limiting is **already Redis-ready**: `src/lib/auth/rate-limit.ts` uses a
-shared Redis sliding-window store whenever `REDIS_URL` is set, and gracefully
-falls back to the in-process store otherwise. Cart/session state lives in
-Postgres, so Redis is only needed once you run multiple app instances and want
-strict cross-instance rate limits.
+Before each production deployment, run:
 
-- Set `REDIS_URL=redis://...` (Upstash / Redis Cloud / self-hosted). Nothing
-  else changes.
+```sh
+pnpm install --frozen-lockfile
+pnpm exec prisma validate
+pnpm run type-check
+pnpm test
+pnpm run build
+```
 
----
+The build does not contact the production database or apply migrations. Never
+run development seed data or destructive schema sync commands on production.
+Keep the previous working deployment available for rollback, and take a
+database backup before any release that changes the schema.
 
-## 5. Error monitoring — Sentry (**YOU**)
+## 6. Docker-capable alternatives
 
-- Create a Sentry project → copy the **DSN**
-  (`https://<key>@<org>.ingest.sentry.io/<project>`).
-- Set `SENTRY_DSN` in production env. That's it — the SDK is already wired at
-  the single error choke point (`src/lib/auth/errors.ts`), so **every API
-  route's unhandled 5xx** is captured (4xx client errors are intentionally
-  skipped to avoid alert spam). Without the DSN the wrapper logs to the console
-  and costs nothing.
-- Frontend/browser tracing and sourcemap uploads are deliberately not enabled
-  (they need `@sentry/nextjs` + a `SENTRY_AUTH_TOKEN`); add later if you want
-  them.
+The repository also includes a Dockerfile and a local Docker Compose stack.
+The Docker image uses the same locked pnpm dependencies and checked-in
+PostgreSQL migrations. Configure all production secrets at runtime; do not use
+the local Compose credentials on a public server. Docker builds must receive
+the public URL (and Google OAuth client ID if Google sign-in is enabled) as
+build arguments because Next.js embeds `NEXT_PUBLIC_*` values in the compiled
+app:
 
----
+```sh
+docker build \
+  --build-arg NEXT_PUBLIC_SITE_URL=https://your-domain \
+  --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id \
+  -t snack-pod .
+```
 
-## 6. Uptime monitoring — UptimeRobot (**YOU**)
-
-- Sign up at [UptimeRobot](https://index.trygravity.ai/go/ce8dc63e-f53f-4b48-b0f7-1110f7c78ede)
-  (free tier: 50 monitors @ 1-min checks).
-- Add a monitor: **HTTP(S)** → `https://<your-prod-url>/api/health` →
-  interval 1–5 min → alert contact = your email.
-- `/api/health` returns `200 {ok:true, db:'up'}` only when the database
-  answers, so a down DB (not just a down server) pages you. The optional
-  `UPTIMEROBOT_API_KEY` can be used to create monitors programmatically.
-
----
-
-## 7. CI/CD (GitHub Actions)
-
-- **`.github/workflows/ci.yml`** — runs on every push/PR: install, Prisma
-  generate, `tsc` typecheck, `bun audit` (non-blocking), and a full
-  `next build`.
-- **`.github/workflows/deploy.yml`** — on merge to `main`: builds the Docker
-  image and pushes `ghcr.io/<owner>/<repo>:latest` + `:<sha>`. Set an optional
-  `DEPLOY_WEBHOOK_URL` secret to trigger a host redeploy after the push.
-- Lint is not gated because the repo ships no ESLint config; add
-  `eslint.config.mjs` (flat config) first if you want a lint step.
-
----
-
-## 8. Environment variables (production)
-
-| Var | Required | Purpose |
-| --- | --- | --- |
-| `DATABASE_URL` | ✅ | Managed Postgres connection string (Neon/Supabase) |
-| `JWT_ACCESS_SECRET` | ✅ | Signs 15-min access tokens (≥32 random chars) |
-| `JWT_RESET_SECRET` | ✅ | Signs password-reset tokens (≥32 random chars) |
-| `APP_ORIGIN` | ✅ | Canonical origin, e.g. `https://app.example.com` |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | for Google login | OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | for Google login | OAuth client secret |
-| `STRIPE_SECRET_KEY` | for card payments | Stripe (test or live) key |
-| `STRIPE_WEBHOOK_SECRET` | for card payments | Webhook signing secret |
-| `RESEND_API_KEY` | for email | Transactional email |
-| `TWILIO_ACCOUNT_SID` / `TWILIO_AUTH_TOKEN` / `TWILIO_PHONE_NUMBER` | for SMS | OTP + order SMS |
-| `SENTRY_DSN` | for alerts | Error monitoring |
-| `REDIS_URL` | optional | Shared rate limiting (multi-instance) |
-| `UPTIMEROBOT_API_KEY` | optional | Programmatic uptime monitors |
-
-Sandbox `.env` values are dev values; anything that must differ in production
-goes through `freebuff-deploy env set '{"KEY":"value"}'`.
-
----
-
-## 9. Rollback plan
-
-See `docs/ROLLBACK.md` for the full rollback procedure. Summary:
-
-- **Freebuff hosting:** redeploy a previous good build from the Deployments tab.
-- **Docker/GHCR:** pin the last known-good SHA: `docker run ghcr.io/<owner>/<repo>:<previous-sha>`.
-- **Database:** all Phase 1–14 migrations are additive-only (new columns with
-  defaults, new indexes, new tables). Roll back code freely; the old code
-  ignores unknown columns. Never roll back the database schema itself.
-
----
-
-## 10. Staging deploy path
-
-1. Push to `main` — GitHub Actions runs typecheck, unit tests, build, and
-   Playwright e2e tests.
-2. Freebuff auto-deploys to staging on merge to `main`.
-3. Set staging env vars: `freebuff-deploy env set '{"DATABASE_URL":"...", ...}'`
-4. Verify: `GET /api/health` → `200 {ok:true, db:'up'}`
-5. Run the load test: `BASE_URL=https://staging.snackpod.in TOKEN=<jwt> node scripts/load-test-checkout.js`
-
-## 11. Fresh-deploy checklist (Phase 14 checkpoint)
-
-1. `docker compose up --build` locally (app + Postgres + Redis) — or deploy to
-   Freebuff hosting.
-2. `GET /api/health` → `200 ok:true db:up`.
-3. Signup with email/password → verify phone via OTP (dev SMS echoes the code).
-4. Create a branch + menu items (super admin seed: `super_admin@snackpod.local`
-   / `SuperAdmin@123!`).
-5. Place an order, walk it through branch accept → delivered (COD) or pay via
-   Stripe test mode (webhook-verified).
-6. Trigger a deliberate 5xx once and confirm it appears in Sentry.
-7. Confirm UptimeRobot is polling `/api/health` and that a stopped app pages
-   you.
-8. Confirm Sentry receives a test error (trigger a deliberate 5xx).
-9. Run the Playwright e2e test against staging.
-10. Run the load test script against staging and verify p99 < 2s.
+Pass database and private integration secrets only to the running container;
+never use build arguments for secrets.

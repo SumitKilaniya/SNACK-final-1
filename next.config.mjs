@@ -2,12 +2,8 @@ import { imageHosts } from './image-hosts.config.mjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // pnpm's symlinked dependencies cannot be copied into standalone output on
-    // Windows without Developer Mode; keep standalone output for Linux deploys.
-    output: process.platform === 'win32' ? undefined : 'standalone',
-    typescript: {
-        ignoreBuildErrors: true,
-    },
+    // Hostinger's Node.js application runner and `next start` use the standard
+    // Next.js output rather than the standalone custom server.
     // Bound the page-data worker pool. This app's module graph is large and
     // build servers often run in memory-capped containers (2 GiB cgroups,
     // small PaaS plans) where the default `cpus - 1` workers (48 here) OOM
@@ -15,9 +11,6 @@ const nextConfig = {
     // builds are slightly slower on big machines, reliably green on small ones.
     experimental: {
         cpus: 2,
-    },
-    eslint: {
-        ignoreDuringBuilds: true,
     },
     images: {
         remotePatterns: imageHosts,

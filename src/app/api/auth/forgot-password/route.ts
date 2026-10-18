@@ -3,10 +3,11 @@ import { createHash } from 'crypto';
 import { prisma } from '@/lib/auth/prisma';
 import { forgotPasswordSchema } from '@/lib/auth/validation';
 import { signResetToken, RESET_TOKEN_TTL_SECONDS } from '@/lib/auth/jwt';
-import { checkRateLimit, clientIp, requestContext } from '@/lib/auth/rate-limit';
+import { checkRateLimit, clientIp } from '@/lib/auth/rate-limit';
 import { auditLog } from '@/lib/auth/audit';
 import { ApiError, handleError } from '@/lib/auth/errors';
 import { assertSameOrigin } from '@/lib/auth/cookies';
+import { getEmailProvider } from '@/lib/notifications/email';
 
 export const runtime = 'nodejs';
 
@@ -42,7 +43,15 @@ export async function POST(req: NextRequest) {
       });
       const origin = process.env.APP_ORIGIN ?? 'http://localhost:3000';
       devLink = `${origin}/reset-password?token=${token}`;
-      console.log(`[auth:dev] password reset link for ${email}: ${devLink}`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`[auth:dev] password reset link for ${email}: ${devLink}`);
+      } else {
+        await getEmailProvider().send({
+          to: user.email,
+          subject: 'Reset your Snack-Pod password',
+          html: `<p>Use this secure link to reset your password:</p><p><a href="${devLink}">Reset password</a></p><p>This link expires in 15 minutes. If you did not request it, ignore this email.</p>`,
+        });
+      }
       await auditLog({ userId: user.id, action: 'password_reset_requested', ip, meta: { email } });
     } else {
       // Burn identical time to keep the endpoint's latency uniform.

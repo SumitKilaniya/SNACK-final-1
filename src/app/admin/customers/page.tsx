@@ -2,20 +2,22 @@
 
 import React, { useEffect, useState } from 'react';
 import { Download } from 'lucide-react';
-import * as XLSX from 'xlsx';
 import { adminApi } from '@/lib/admin-api';
 
-interface CustomerOrder {
+interface CustomerOrderSummary {
   id: string;
   status: string;
-  subtotal: number;
-  deliveryFee: number;
-  discount: number;
   total: number;
   paymentMethod: string;
   createdAt: string;
-  items: { id: string; name: string; quantity: number; unitPrice: number; total: number }[];
   branch: { name: string } | null;
+}
+
+interface CustomerOrder extends CustomerOrderSummary {
+  subtotal: number;
+  deliveryFee: number;
+  discount: number;
+  items: { id: string; name: string; quantity: number; unitPrice: number; total: number }[];
 }
 
 interface Customer {
@@ -24,7 +26,7 @@ interface Customer {
   email: string;
   phone: string | null;
   createdAt: string;
-  orders: CustomerOrder[];
+  orders: CustomerOrderSummary[];
 }
 
 const formatCurrency = (amount: number) =>
@@ -43,6 +45,9 @@ export default function AdminCustomersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedCustomerId, setExpandedCustomerId] = useState<string | null>(null);
+  const [orderHistories, setOrderHistories] = useState<Record<string, CustomerOrder[]>>({});
+  const [loadingHistoryId, setLoadingHistoryId] = useState<string | null>(null);
+  const [historyErrors, setHistoryErrors] = useState<Record<string, string>>({});
 
   const loadCustomers = async () => {
     setLoading(true);
@@ -75,7 +80,8 @@ export default function AdminCustomersPage() {
   );
   const returningCustomers = customers.filter((customer) => customer.orders.length > 0).length;
 
-  const downloadExcel = () => {
+  const downloadExcel = async () => {
+    const XLSX = await import('xlsx');
     const workbook = XLSX.utils.book_new();
     const headers = [
       'Customer Name',
@@ -133,6 +139,41 @@ export default function AdminCustomersPage() {
     window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
   };
 
+  const loadOrderHistory = async (customerId: string) => {
+    setHistoryErrors((errors) => {
+      const remaining = { ...errors };
+      delete remaining[customerId];
+      return remaining;
+    });
+    if (orderHistories[customerId]) return;
+
+    setLoadingHistoryId(customerId);
+    try {
+      const result = await adminApi<{ orders: CustomerOrder[] }>(
+        `/api/admin/customers/${encodeURIComponent(customerId)}/orders`
+      );
+      setOrderHistories((histories) => ({ ...histories, [customerId]: result.orders }));
+    } catch (loadError) {
+      setHistoryErrors((errors) => ({
+        ...errors,
+        [customerId]:
+          loadError instanceof Error ? loadError.message : 'Failed to load order history',
+      }));
+    } finally {
+      setLoadingHistoryId((currentId) => (currentId === customerId ? null : currentId));
+    }
+  };
+
+  const toggleOrderHistory = (customerId: string) => {
+    if (expandedCustomerId === customerId) {
+      setExpandedCustomerId(null);
+      return;
+    }
+
+    setExpandedCustomerId(customerId);
+    void loadOrderHistory(customerId);
+  };
+
   return (
     <div className="mx-auto max-w-7xl space-y-6">
       <header className="flex flex-col justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs sm:flex-row sm:items-center">
@@ -148,7 +189,15 @@ export default function AdminCustomersPage() {
         <div className="flex flex-wrap items-center gap-2 sm:justify-end">
           <button
             type="button"
-            onClick={downloadExcel}
+            onClick={() => {
+              void downloadExcel().catch((exportError: unknown) => {
+                setError(
+                  exportError instanceof Error
+                    ? `Failed to create Excel export: ${exportError.message}`
+                    : 'Failed to create Excel export'
+                );
+              });
+            }}
             disabled={loading || filteredCustomers.length === 0}
             title={`Download ${filteredCustomers.length} customer records${query ? ' matching your search' : ''}`}
             className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
@@ -278,7 +327,7 @@ export default function AdminCustomersPage() {
                           <button
                             type="button"
                             aria-expanded={isExpanded}
-                            onClick={() => setExpandedCustomerId(isExpanded ? null : customer.id)}
+                            onClick={() => toggleOrderHistory(customer.id)}
                             disabled={customer.orders.length === 0}
                             className="rounded-lg px-2.5 py-1.5 text-xs font-bold text-primary hover:bg-primary/10 disabled:cursor-not-allowed disabled:text-slate-400 disabled:hover:bg-transparent"
                           >
@@ -290,35 +339,57 @@ export default function AdminCustomersPage() {
                         <tr className="bg-slate-50">
                           <td colSpan={6} className="px-4 py-4">
                             <div className="space-y-3">
-                              {customer.orders.map((order) => (
-                                <article
-                                  key={order.id}
-                                  className="rounded-lg border border-slate-200 bg-white p-3"
+                              {loadingHistoryId === customer.id ? (
+                                <p className="py-3 text-center text-sm text-slate-500">
+                                  Loading order history…
+                                </p>
+                              ) : historyErrors[customer.id] && !orderHistories[customer.id] ? (
+                                <div
+                                  role="alert"
+                                  className="flex items-center justify-between gap-3 text-sm text-rose-700"
                                 >
-                                  <div className="flex flex-wrap items-center justify-between gap-2">
-                                    <div>
-                                      <p className="font-bold text-slate-900">
-                                        {order.status.replaceAll('_', ' ')} · {formatCurrency(order.total)}
-                                      </p>
-                                      <p className="text-xs text-slate-500">
-                                        {formatDate(order.createdAt)}
-                                        {order.branch ? ` · ${order.branch.name}` : ''}
-                                        {` · ${order.paymentMethod.replaceAll('_', ' ')}`}
-                                      </p>
+                                  <span>{historyErrors[customer.id]}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => void loadOrderHistory(customer.id)}
+                                    className="font-bold underline"
+                                  >
+                                    Try again
+                                  </button>
+                                </div>
+                              ) : (
+                                (orderHistories[customer.id] ?? []).map((order) => (
+                                  <article
+                                    key={order.id}
+                                    className="rounded-lg border border-slate-200 bg-white p-3"
+                                  >
+                                    <div className="flex flex-wrap items-center justify-between gap-2">
+                                      <div>
+                                        <p className="font-bold text-slate-900">
+                                          {order.status.replaceAll('_', ' ')} ·{' '}
+                                          {formatCurrency(order.total)}
+                                        </p>
+                                        <p className="text-xs text-slate-500">
+                                          {formatDate(order.createdAt)}
+                                          {order.branch ? ` · ${order.branch.name}` : ''}
+                                          {` · ${order.paymentMethod.replaceAll('_', ' ')}`}
+                                        </p>
+                                      </div>
+                                      <span className="font-mono text-xs text-slate-400">
+                                        {order.id.slice(-8)}
+                                      </span>
                                     </div>
-                                    <span className="font-mono text-xs text-slate-400">
-                                      {order.id.slice(-8)}
-                                    </span>
-                                  </div>
-                                  <ul className="mt-2 space-y-1 text-xs text-slate-600">
-                                    {order.items.map((item) => (
-                                      <li key={item.id}>
-                                        {item.quantity} × {item.name} · {formatCurrency(item.total)}
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </article>
-                              ))}
+                                    <ul className="mt-2 space-y-1 text-xs text-slate-600">
+                                      {order.items.map((item) => (
+                                        <li key={item.id}>
+                                          {item.quantity} × {item.name} ·{' '}
+                                          {formatCurrency(item.total)}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </article>
+                                ))
+                              )}
                             </div>
                           </td>
                         </tr>

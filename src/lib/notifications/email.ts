@@ -15,8 +15,12 @@ const consoleProvider: { send: (m: EmailMessage) => Promise<void> } = {
 const resendProvider: { send: (m: EmailMessage) => Promise<void> } = {
   async send(message) {
     const key = process.env.RESEND_API_KEY;
-    const from = process.env.RESEND_FROM ?? 'Snack-Pod <orders@snackpod.local>';
-    if (!key) throw new Error('RESEND_API_KEY not configured');
+    const from =
+      process.env.RESEND_FROM ??
+      (process.env.NODE_ENV === 'production' ? undefined : 'Snack-Pod <orders@snackpod.local>');
+    if (!key || !from) {
+      throw new Error('RESEND_API_KEY and RESEND_FROM must be configured for email delivery');
+    }
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -30,5 +34,9 @@ const resendProvider: { send: (m: EmailMessage) => Promise<void> } = {
 };
 
 export function getEmailProvider(): { send: (m: EmailMessage) => Promise<void> } {
-  return process.env.EMAIL_PROVIDER === 'resend' ? resendProvider : consoleProvider;
+  if (process.env.EMAIL_PROVIDER === 'resend') return resendProvider;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Email delivery is not configured for production');
+  }
+  return consoleProvider;
 }

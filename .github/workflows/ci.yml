@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://snackpod:snackpod@127.0.0.1:5432/snackpod
+      JWT_ACCESS_SECRET: ci-access-secret-not-used-for-deployment-0123456789
+      JWT_RESET_SECRET: ci-reset-secret-not-used-for-deployment-0123456789
+      APP_ORIGIN: https://ci.example.invalid
+      NEXT_PUBLIC_SITE_URL: https://ci.example.invalid
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.18.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec prisma validate
+      - run: pnpm run type-check
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm run build

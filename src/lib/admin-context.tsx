@@ -50,11 +50,20 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
     async function verify() {
       if (!getAdminToken()) {
-        const u = await adminRefresh().catch(() => null);
-        if (!u) {
-          if (!cancelled) setState('signedOut');
+        const refreshedUser = await adminRefresh().catch(() => null);
+        if (cancelled) return;
+        if (!refreshedUser) {
+          setState('signedOut');
           return;
         }
+        if (refreshedUser.role === 'CUSTOMER') {
+          clearAdminSession();
+          setState('signedOut');
+          return;
+        }
+        setUser(refreshedUser);
+        setState('signedIn');
+        return;
       }
       try {
         const data = await adminApi<DashboardData>('/api/admin/dashboard');

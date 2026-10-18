@@ -8,6 +8,11 @@
 //   branch_admin   branch_admin@snackpod.local / BranchAdmin@123!
 //   customer       customer@snackpod.local     / Customer@123!
 
+if (process.env.NODE_ENV === 'production') {
+    console.error('Refusing to run the development seed in production.');
+    process.exit(1);
+}
+
 const { PrismaClient, Role } = require('@prisma/client');
 const { hash } = require('@node-rs/argon2');
 

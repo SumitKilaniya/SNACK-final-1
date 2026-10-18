@@ -8,7 +8,7 @@
 export async function verifyCaptcha(token: string | undefined): Promise<boolean> {
   if (!token) return false;
   const secret = process.env.RECAPTCHA_SECRET;
-  if (!secret) return token.length > 0; // dev provider
+  if (!secret) return process.env.NODE_ENV !== 'production' && token.length > 0;
   const body = new URLSearchParams({ secret, response: token });
   const res = await fetch('https://www.google.com/recaptcha/api/siteverify', {
     method: 'POST',

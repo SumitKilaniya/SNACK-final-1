@@ -20,24 +20,25 @@ orders, coupons, users, and reports from a built-in admin panel.
 The app is Postgres-only, so local dev runs against the same database engine
 as production via docker-compose (app + Postgres + Redis).
 
-Prereqs: Docker, and a recent Bun (`curl -fsSL https://bun.sh/install | bash`).
+Prereqs: Docker, Node.js 22, and pnpm 11.
 
 ```bash
 cp .env.example .env.local      # then fill in real values (see below)
-bun install                     # installs deps + runs `prisma generate`
+pnpm install                    # installs locked deps + runs `prisma generate`
 ./scripts/dev-doctor.sh         # builds the stack and verifies it is actually healthy
 ```
 
 - App: http://localhost:3000 — health check: http://localhost:3000/api/health
   (returns `{"ok":true,"db":"up"}` once Postgres answers)
 - Seed dev data (branches, menu, test accounts) on a fresh database:
-  `bunx prisma db seed`
-- Browse the database: `bunx prisma studio`
+  `pnpm exec prisma db seed`
+- Browse the database: `pnpm exec prisma studio`
 
-`scripts/docker-entrypoint.sh` runs `prisma migrate deploy` on container start
-(falling back to a schema sync on a fresh DB) and refuses to start the server
-if the schema step fails; `docker-compose` healthchecks gate the app on
-`db`/`redis` being healthy first.
+Compose applies checked-in PostgreSQL migrations and then starts the app in
+development mode; startup stops if a migration fails. The production Docker
+image uses `scripts/docker-entrypoint.sh` to apply migrations before starting
+Next.js in production. Compose healthchecks gate the app on `db`/`redis` being
+healthy first.
 
 ### Is the app actually working? — `./scripts/dev-doctor.sh`
 
@@ -62,10 +63,10 @@ healthy with a real URL, or print the exact last 50 log lines showing why
 not. Do not rely on any third-party preview/proxy URL to diagnose failures —
 they only show a generic gateway error with no useful information.
 
-Common startup failures are loud by design: missing required env vars print
-`[startup] FATAL: missing required env var …` and the process exits; an
-unreachable database prints `[startup] FATAL: cannot reach database — …`;
-a schema that can't be applied stops the container in the entrypoint.
+Common startup failures are loud by design: missing production env vars print
+`[startup] FATAL: missing required production env var(s) …`; an unreachable
+database prints `[startup] FATAL: cannot reach PostgreSQL — …`; a schema that
+can't be applied stops the container in the entrypoint.
 
 ### Required env vars (local dev)
 
@@ -73,8 +74,8 @@ a schema that can't be applied stops the container in the entrypoint.
 | --- | --- |
 | `DATABASE_URL` | `postgresql://snackpod:snackpod@localhost:5432/snackpod` (docker-compose `db`) |
 | `APP_ORIGIN` | `http://localhost:3000` |
-| `JWT_ACCESS_SECRET` | ≥32 random chars (generate: `openssl rand -hex 32`) |
-| `JWT_RESET_SECRET` | ≥32 random chars |
+| `JWT_ACCESS_SECRET` | ≥32 random chars (generate: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`) |
+| `JWT_RESET_SECRET` | A separate ≥32 random chars |
 
 Optional: Google OAuth, Stripe, Twilio, Resend, Sentry, Redis — see
 `.env.example` for the full list with comments, and `DEPLOYMENT.md` for
@@ -87,24 +88,23 @@ Seed accounts (dev only): `super_admin@snackpod.local / SuperAdmin@123!`,
 ## Useful scripts
 
 - `./scripts/dev-doctor.sh` — **the** health check: build + start + verify `/api/health`
-- `bun run dev` — Next.js dev server on port 3000 (binds 0.0.0.0; honors `$PORT`)
-- `bun run build` / `bun run start` — production build / server
-- `bun run type-check` — TypeScript check (`tsc --noEmit`)
-- `bun test` — unit tests (coupon pricing, order state machine)
-- `bun run lint` / `bun run format` — ESLint / Prettier
+- `pnpm dev` — Next.js dev server on port 3000 (binds 0.0.0.0)
+- `pnpm build` / `pnpm start` — production build / server (start honors `PORT`)
+- `pnpm type-check` — TypeScript check (`tsc --noEmit`)
+- `pnpm test` — unit tests
+- `pnpm format` — Prettier
 
-For production-like response times, use `bun run build` followed by
-`bun run start`; the development server compiles routes on demand. The
+For production-like response times, use `pnpm build` followed by
+`pnpm start`; the development server compiles routes on demand. The
 development component tagger is disabled by default to reduce compile
 overhead; set `ENABLE_COMPONENT_TAGGER=true` when you need it.
 
 ## Deployment & operations
 
-See **[DEPLOYMENT.md](./DEPLOYMENT.md)** — the operational manual: managed
-Postgres, secrets, Stripe webhooks, Sentry, uptime monitoring, CI/CD, rollback,
-and the fresh-deploy checklist. Self-hosting ships a `Dockerfile`,
-`docker-compose.yml`, and a GitHub Actions pipeline (GHCR image on merge to
-`main`).
+See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for the Hostinger Cloud Node.js
+deployment steps, PostgreSQL setup, required secrets, first-admin bootstrap,
+payments, backups, and post-deploy checks. A `Dockerfile` and
+`docker-compose.yml` are also included for Docker-capable hosts.
 
 ## Project layout
 

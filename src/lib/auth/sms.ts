@@ -32,5 +32,9 @@ const twilioProvider: SmsProvider = {
 };
 
 export function getSmsProvider(): SmsProvider {
-  return process.env.SMS_PROVIDER === 'twilio' ? twilioProvider : consoleProvider;
+  if (process.env.SMS_PROVIDER === 'twilio') return twilioProvider;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('SMS delivery is not configured for production');
+  }
+  return consoleProvider;
 }

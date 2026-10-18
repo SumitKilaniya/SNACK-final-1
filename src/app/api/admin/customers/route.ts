@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/auth/prisma';
-import { ApiError, handleError } from '@/lib/auth/errors';
+import { handleError } from '@/lib/auth/errors';
 import { requireAuth, requireRole } from '@/lib/auth/guard';
 import { assertSameOrigin } from '@/lib/auth/csrf';
 import { requestContext } from '@/lib/auth/rate-limit';
@@ -41,15 +41,6 @@ export async function GET(req: NextRequest) {
             total: true,
             paymentMethod: true,
             createdAt: true,
-            items: {
-              select: {
-                id: true,
-                name: true,
-                quantity: true,
-                unitPrice: true,
-                total: true,
-              },
-            },
             branch: {
               select: {
                 name: true,

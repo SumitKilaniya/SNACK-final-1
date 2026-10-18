@@ -1,10 +1,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Snack-Pod authentication & authorization schema
 // ─────────────────────────────────────────────────────────────────────────────
-// Postgres everywhere: local dev and production use the same provider so
-// behavior (transactions, types, constraints) is identical in both. Local dev
-// points DATABASE_URL at the docker-compose Postgres service; production sets
-// a managed Postgres connection string. No model changes required for either.
+// PostgreSQL is the production datasource and matches the checked-in migration
+// history. Local development uses the Postgres service in docker-compose.
 //
 // Migrations:  bunx prisma migrate dev --name <name>
 // Seed data:   bunx prisma db seed   (creates branch + super_admin + branch_admin)
@@ -14,8 +12,8 @@ generator client {
 }
 
 datasource db {
-    provider = "sqlite"
-    url      = "file:./dev.db"
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 /// customer | branch_admin | super_admin
@@ -32,7 +30,7 @@ model Branch {
     city      String?
     address   String?
     /// JSON array of pincodes this branch can serve, e.g. ["560076","560078"].
-    /// Stored as text for SQLite portability; parsed in code.
+    /// Stored as JSON text; parsed in code.
     servicePincodes String?
     isActive  Boolean  @default(true)
     createdAt DateTime @default(now())

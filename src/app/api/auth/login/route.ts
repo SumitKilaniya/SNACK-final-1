@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Tier 1: CAPTCHA required after 5 failures.
-    if (user.failedLoginAttempts >= CAPTCHA_AFTER_FAILURES) {
+    if (user.failedLoginAttempts >= CAPTCHA_AFTER_FAILURES && process.env.RECAPTCHA_SECRET) {
       const captchaOk = await verifyCaptcha(input.captchaToken);
       if (!captchaOk) {
         throw new ApiError(400, 'Please complete the security check', 'CAPTCHA_REQUIRED', {

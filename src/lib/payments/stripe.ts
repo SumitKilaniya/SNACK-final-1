@@ -21,7 +21,7 @@ function requireKey(name: string): string {
  * in Keys/API keys — checkout falls back to a clear error, never a crash.
  */
 function getStripe(): Stripe {
-  return new Stripe(requireKey('STRIPE_SECRET_KEY'), { apiVersion: '2026-07-29.dahlia' });
+  return new Stripe(requireKey('STRIPE_SECRET_KEY'), { apiVersion: '2026-08-26.dahlia' });
 }
 
 /** Stripe's signed header: t=<unix-seconds>,v1=<hmac-sha256(secret, `${t}.${payload}`) hex> */
@@ -97,7 +97,7 @@ export const stripeProvider: PaymentProvider = {
    * Verify the webhook signature locally (HMAC-SHA256, constant-time compare)
    * and normalize the event. Implemented directly on Node crypto rather than
    * stripe.webhooks.constructEvent so it behaves identically across runtimes
-   * (Bun/Next.js Node runtime). Throws INVALID_WEBHOOK_SIGNATURE on any
+   * (Next.js Node runtime). Throws INVALID_WEBHOOK_SIGNATURE on any
    * missing/invalid signature — BEFORE any side effect.
    */
   async handleWebhook(rawBody: string, signature: string | null): Promise<WebhookResult> {
