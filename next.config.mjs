@@ -3,6 +3,7 @@ import { imageHosts } from './image-hosts.config.mjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    output: 'standalone',
     // Hostinger production build settings
     experimental: {
         cpus: 2,
