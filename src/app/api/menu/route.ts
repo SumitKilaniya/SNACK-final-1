@@ -13,13 +13,20 @@ const FALLBACK_BRANCH = {
   servicePincodes: ['560076', '560078', '560103'],
 };
 
+type MenuBranch = {
+  id: string;
+  name: string;
+  city: string | null;
+  servicePincodes: string | null;
+  isActive: boolean;
+};
+
 export async function GET(req: NextRequest) {
   try {
-    const requested = req.nextUrl.searchParams
-      .get('branchId')
-      ?.trim();
+    const requested =
+      req.nextUrl.searchParams.get('branchId')?.trim();
 
-    let branch = requested
+    const dbBranch = requested
       ? await prisma.branch.findUnique({
           where: { id: requested },
         })
@@ -28,12 +35,18 @@ export async function GET(req: NextRequest) {
           orderBy: { name: 'asc' },
         });
 
-    if (!branch || !branch.isActive) {
-      branch = {
-        ...FALLBACK_BRANCH,
-        id: requested || FALLBACK_BRANCH.id,
-      };
-    }
+    const branch: MenuBranch =
+      dbBranch && dbBranch.isActive
+        ? dbBranch
+        : {
+            id: requested || FALLBACK_BRANCH.id,
+            name: FALLBACK_BRANCH.name,
+            city: FALLBACK_BRANCH.city,
+            servicePincodes: JSON.stringify(
+              FALLBACK_BRANCH.servicePincodes
+            ),
+            isActive: true,
+          };
 
     const items = await getMenuForBranch(branch.id);
 
@@ -42,9 +55,7 @@ export async function GET(req: NextRequest) {
         id: branch.id,
         name: branch.name,
         city: branch.city,
-        servicePincodes: Array.isArray(branch.servicePincodes)
-          ? branch.servicePincodes
-          : parsePincodes(branch),
+        servicePincodes: parsePincodes(branch),
       },
       items,
     });
