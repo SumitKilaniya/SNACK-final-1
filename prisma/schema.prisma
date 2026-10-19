@@ -1,3 +1,490 @@
+// ────────────────────────────────────────────────────────────────
+// Snack-Pod authentication & authorization schema
+// ────────────────────────────────────────────────────────────────
+// PostgreSQL is the production datasource and matches the checked-in migration
+// history. Local development uses the Postgres service in docker-compose.
+//
+// Migrations:  bunx prisma migrate dev --name <name>
+// Seed data:   bunx prisma db seed   (creates branch + super_admin + branch_admin)
+
 generator client {
     provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+/// customer | branch_admin | super_admin
+enum Role {
+    CUSTOMER
+    BRANCH_ADMIN
+    SUPER_ADMIN
+}
+
+/// A physical restaurant outlet. Branch admins are scoped to exactly one branch.
+model Branch {
+    id        String   @id @default(cuid())
+    name      String
+    city      String?
+    address   String?
+    /// JSON array of pincodes this branch can serve, e.g. ["560076","560078"].
+    /// Stored as JSON text; parsed in code.
+    servicePincodes String?
+    isActive  Boolean  @default(true)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    users         User[]
+    menuOverrides BranchMenuOverride[]
+    orders        Order[]
+    carts         Cart[]
+    coupons       Coupon[]
+
+    @@map("branches")
+}
+
+/// A restaurant account. Passwords are Argon2id-hashed; the hash is never exposed.
+model User {
+    id                  String   @id @default(cuid())
+    email               String   @unique
+    name                String
+    passwordHash        String? // null for Google-only accounts until a password is set
+    phone               String? // E.164-ish normalized, e.g. +919876543210
+    phoneVerified       Boolean  @default(false)
+    role                Role     @default(CUSTOMER)
+    branchId            String?
+    /// Bumped on logout-all / password change / token reuse → invalidates every session instantly.
+    tokenVersion        Int      @default(0)
+    failedLoginAttempts Int      @default(0)
+    lockedUntil         DateTime?
+    /// Set when a super admin deactivates the account — the user can no longer
+    /// sign in or use any API until it is cleared.
+    deactivatedAt       DateTime?
+    createdAt           DateTime @default(now())
+    updatedAt           DateTime @updatedAt
+
+    branch         Branch?          @relation(fields: [branchId], references: [id], onDelete: SetNull)
+    accounts       Account[]
+    refreshTokens  RefreshToken[]
+    passwordResets PasswordReset[]
+    otps           Otp[]
+    auditLogs      AuditLog[]
+    addresses      Address[]
+    cart           Cart?
+    orders         Order[]
+    couponUsages   CouponUsage[]
+    reviews        Review[]
+    wishlists      Wishlist[]
+
+    @@index([phone])
+    @@map("users")
+}
+
+/// OAuth provider links (Google etc.). A user can have many providers.
+model Account {
+    id                String   @id @default(cuid())
+    userId            String
+    provider          String // e.g. "google"
+    providerAccountId String
+    email             String?
+    name              String?
+    picture           String?
+    createdAt         DateTime @default(now())
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([provider, providerAccountId])
+    @@unique([provider, userId])
+    @@map("accounts")
+}
+
+/// Opaque, 30-day refresh tokens. Only the SHA-256 hash is stored; the raw
+/// token is handed to the browser once as an httpOnly cookie. Rotation marks
+/// the old row revoked and stores the replacement jti — presenting a revoked
+/// token (reuse) revokes the entire session family.
+model RefreshToken {
+    id          String    @id @default(cuid())
+    jti         String    @unique
+    userId      String
+    tokenHash   String    @unique
+    expiresAt   DateTime
+    revokedAt   DateTime?
+    replacedByJti String?
+    userAgent   String?
+    ip          String?
+    createdAt   DateTime  @default(now())
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@map("refresh_tokens")
+}
+
+/// One-time passcodes for phone verification. The code itself is hashed
+/// (HMAC-SHA256 with a per-request salt); attempts are capped.
+model Otp {
+    id        String    @id @default(cuid())
+    phone     String
+    codeHash  String
+    attempts  Int       @default(0)
+    expiresAt DateTime
+    verifiedAt DateTime?
+    createdAt DateTime  @default(now())
+
+    user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+    userId String?
+
+    @@index([phone, createdAt])
+    @@map("otps")
+}
+
+/// Signed, single-use password reset tokens (15 min TTL). The raw token is
+/// emailed; only its hash is stored. Marked used on first consumption.
+model PasswordReset {
+    id        String    @id @default(cuid())
+    userId    String
+    tokenHash String    @unique
+    expiresAt DateTime
+    usedAt    DateTime?
+    createdAt DateTime  @default(now())
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+    @@map("password_resets")
+}
+
+/// A single dish in the master catalog. Prices are whole rupees (int) to stay
+/// consistent with the app's existing ₹-integer pricing; payment providers
+/// convert to the smallest unit (paise ×100) at checkout.
+model MenuItem {
+    id          String   @id @default(cuid())
+    name        String
+    description String?
+    category    String
+    basePrice   Int
+    isAvailable Boolean  @default(true)
+    isVeg       Boolean?
+    imageUrl    String?
+    /// Shown as "★ Bestseller" on dish cards. Purely presentational.
+    isBestseller Boolean  @default(false)
+    /// Optional custom badge text, e.g. "New Arrivals", "Chef Special".
+    badge       String?
+    rating      Float    @default(4.5)
+    reviewCount Int      @default(0)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    overrides  BranchMenuOverride[]
+    orderItems OrderItem[]
+    cartItems  CartItem[]
+    reviews    Review[]
+    wishlisted Wishlist[]
+
+    @@index([category])
+    @@index([category, isAvailable])
+    @@index([isAvailable])
+    @@map("menu_items")
+}
+
+/// Per-branch price/availability overrides on top of the master catalog.
+/// The customer-facing price is `priceOverride ?? basePrice`; an item is
+/// only offered when the master item AND the branch override (if any) are
+/// available.
+model BranchMenuOverride {
+    id            String   @id @default(cuid())
+    branchId      String
+    itemId        String
+    priceOverride Int? // whole rupees; null → fall back to master basePrice
+    isAvailable   Boolean  @default(true)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    branch Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+    item   MenuItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+    @@unique([branchId, itemId])
+    @@index([branchId])
+    @@map("branch_menu_overrides")
+}
+
+/// A customer's saved delivery address. Checkout validates the pincode
+/// against the selected branch's service area before placing an order.
+model Address {
+    id        String   @id @default(cuid())
+    userId    String
+    label     String? // e.g. "Home", "Office"
+    line1     String
+    line2     String?
+    city      String
+    state     String?
+    pincode   String
+    isDefault Boolean  @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    orders Order[]
+
+    @@index([userId])
+    @@map("addresses")
+}
+
+/// Orders are the central entity of the ordering flow.
+enum OrderStatus {
+    PLACED
+    ACCEPTED_BY_BRANCH
+    PREPARING
+    READY_OR_OUT_FOR_DELIVERY
+    DELIVERED
+    REJECTED_BY_BRANCH
+    CANCELLED_BY_CUSTOMER
+    PAYMENT_FAILED
+    REFUNDED
+}
+
+/// One active cart per user, scoped to a single branch.
+model Cart {
+    id        String   @id @default(cuid())
+    userId    String   @unique
+    branchId  String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    branch Branch     @relation(fields: [branchId], references: [id], onDelete: Cascade)
+    items  CartItem[]
+
+    @@index([branchId])
+    @@map("carts")
+}
+
+model CartItem {
+    id        String   @id @default(cuid())
+    cartId    String
+    itemId    String
+    quantity  Int
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    cart Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+    item MenuItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+    @@unique([cartId, itemId])
+    @@map("cart_items")
+}
+
+/// A customer order. Totals are ALWAYS computed server-side from the catalog
+/// at checkout time; prices are snapshotted onto order_items. `discount` is
+/// the coupon discount (whole rupees) — never accepted from the client.
+model Order {
+    id             String      @id @default(cuid())
+    userId         String
+    branchId       String
+    addressId      String?
+    couponId       String?
+    status         OrderStatus @default(PLACED)
+    subtotal       Int
+    deliveryFee    Int
+    discount       Int         @default(0)
+    total          Int
+    paymentMethod  String      @default("cod") // cod | card
+    paymentStatus  String      @default("pending") // pending | paid | failed | refunded
+    /// Client-supplied dedupe key; re-POSTing the same key returns the same order.
+    idempotencyKey String?     @unique
+    notes          String?
+    createdAt      DateTime    @default(now())
+    updatedAt      DateTime    @updatedAt
+
+    user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    branch       Branch        @relation(fields: [branchId], references: [id], onDelete: Restrict)
+    address      Address?      @relation(fields: [addressId], references: [id], onDelete: SetNull)
+    coupon       Coupon?       @relation(fields: [couponId], references: [id], onDelete: SetNull)
+    items        OrderItem[]
+    statusLogs   OrderStatusLog[]
+    payments     Payment[]
+    couponUsages CouponUsage[]
+
+    @@index([branchId, status])
+    @@index([userId, createdAt])
+    @@index([couponId])
+    @@index([createdAt])
+    @@index([paymentStatus])
+    @@map("orders")
+}
+
+/// Promotional codes. All rules are evaluated SERVER-SIDE at checkout — an
+/// expired / used-up / wrong-branch coupon is rejected even if a crafted
+/// client submits it. `discount` is recomputed from the DB catalog, never
+/// taken from the request.
+enum CouponType {
+    FLAT // fixed ₹ off the subtotal
+    PERCENTAGE // % off the subtotal, optionally capped by maxDiscount
+    FREE_DELIVERY // waives the delivery fee
+    FIRST_ORDER // percentage off, only redeemable on the customer's first order
+}
+
+model Coupon {
+    id            String     @id @default(cuid())
+    code          String     @unique
+    type          CouponType
+    /// FLAT: whole rupees; PERCENTAGE / FIRST_ORDER: percent (0–100); FREE_DELIVERY: unused.
+    value         Int        @default(0)
+    description   String?
+    /// The order subtotal must be ≥ this for the coupon to apply.
+    minOrderValue Int        @default(0)
+    /// Absolute cap for PERCENTAGE / FIRST_ORDER discounts.
+    maxDiscount   Int?
+    /// How many times ONE user may redeem this coupon (across orders).
+    perUserLimit  Int        @default(1)
+    /// null = global; set = valid only at this branch.
+    branchId      String?
+    expiresAt     DateTime?
+    isActive      Boolean    @default(true)
+    createdAt     DateTime   @default(now())
+    updatedAt     DateTime   @updatedAt
+
+    branch Branch?      @relation(fields: [branchId], references: [id], onDelete: SetNull)
+    usages CouponUsage[]
+    orders Order[]
+
+    @@index([code])
+    @@map("coupons")
+}
+
+/// One redemption of a coupon on an order. Created inside the same checkout
+/// transaction as the order, so retried/duplicate checkouts can never double
+/// count usage. `@@unique([couponId, orderId])` keeps one coupon per order.
+model CouponUsage {
+    id        String   @id @default(cuid())
+    couponId  String
+    userId    String
+    orderId   String
+    discount  Int
+    createdAt DateTime @default(now())
+
+    coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+    @@unique([couponId, orderId])
+    @@index([couponId, userId])
+    @@map("coupon_usages")
+}
+
+/// One gateway payment record per order (Stripe session, or COD marker).
+/// `providerRef` holds the gateway's payment identifier (Stripe payment_intent
+/// id once confirmed — what refunds need); `refundRef` the gateway refund id.
+model Payment {
+    id             String    @id @default(cuid())
+    orderId        String
+    provider       String // stripe | cod (paytm later)
+    providerRef    String? // Stripe session → payment_intent id; null for COD
+    checkoutUrl    String? // Stripe hosted Checkout URL (recoverable on idempotent retry)
+    amount         Int // whole rupees, matches order.total
+    currency       String    @default("inr")
+    status         String    @default("pending") // pending | succeeded | failed | refunded
+    refundRef      String?
+    refundedAmount Int?
+    refundedAt     DateTime?
+    idempotencyKey String?   @unique
+    createdAt      DateTime  @default(now())
+    updatedAt      DateTime  @updatedAt
+
+    order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+    @@index([orderId])
+    @@map("payments")
+}
+
+/// Snapshot of a line item at order time (name + unit price are frozen).
+model OrderItem {
+    id        String @id @default(cuid())
+    orderId   String
+    itemId    String?
+    name      String
+    quantity  Int
+    unitPrice Int
+    total     Int
+
+    order Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    item  MenuItem? @relation(fields: [itemId], references: [id], onDelete: SetNull)
+
+    @@index([orderId])
+    @@map("order_items")
+}
+
+/// Immutable audit of every order state transition (who/role/when).
+model OrderStatusLog {
+    id          String       @id @default(cuid())
+    orderId     String
+    fromStatus  OrderStatus?
+    toStatus    OrderStatus
+    actorUserId String?
+    actorRole   String?
+    note        String?
+    createdAt   DateTime     @default(now())
+
+    order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+    @@index([orderId, createdAt])
+    @@map("order_status_logs")
+}
+
+/// Immutable security event trail: login, logout, password change, role
+/// change, OTP verification, token reuse, account lockout.
+model AuditLog {
+    id        String   @id @default(cuid())
+    userId    String?
+    action    String
+    ip        String?
+    userAgent String?
+    meta      String? // small JSON payload
+    createdAt DateTime @default(now())
+
+    user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+    @@index([userId, createdAt])
+    @@index([action, createdAt])
+    @@map("audit_logs")
+}
+
+/// One review per (user, menu item). isHidden is a soft-moderation flag;
+/// hidden reviews are excluded from the aggregate and public listing but
+/// remain in the database for audit purposes.
+model Review {
+    id         String   @id @default(cuid())
+    userId     String
+    menuItemId String
+    rating     Int      // 1–5, enforced by Zod at the API boundary
+    comment    String   @default("")
+    isHidden   Boolean  @default(false)
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    menuItem MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, menuItemId])
+    @@index([menuItemId, createdAt])
+    @@index([userId])
+    @@map("reviews")
+}
+
+/// A customer's wishlisted menu items. On login the local-only guest wishlist
+/// is merged into this (set union — no branch/quantity conflicts).
+model Wishlist {
+    id         String   @id @default(cuid())
+    userId     String
+    menuItemId String
+    createdAt  DateTime @default(now())
+
+    user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    menuItem MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, menuItemId])
+    @@index([userId])
+    @@map("wishlists")
 }
