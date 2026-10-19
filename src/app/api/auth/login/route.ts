@@ -39,8 +39,8 @@ export async function POST(req: NextRequest) {
     }
 
     const user =
-      (await prisma.user.findUnique({ where: { email: identifier } }).catch(() => null)) ??
-      (await prisma.user.findFirst({ where: { phone: identifier } }).catch(() => null));
+      (await prisma.user.findUnique({ where: { email: identifier } })) ??
+      (await prisma.user.findFirst({ where: { phone: identifier } }));
 
     // Uniform branch: wrong credentials, unknown account, locked account
     // and Google-only accounts all yield the same generic message.

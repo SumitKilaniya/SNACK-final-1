@@ -1,6 +1,19 @@
 import { NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { ZodError } from 'zod';
 import { captureError } from '@/lib/monitoring/sentry';
+
+const DATABASE_CONNECTION_ERROR_CODES = new Set([
+  'P1000',
+  'P1001',
+  'P1002',
+  'P1003',
+  'P1008',
+  'P1010',
+  'P1011',
+  'P1013',
+  'P1017',
+]);
 
 /** Error carrying an HTTP status + machine-readable code. */
 export class ApiError extends Error {
@@ -30,6 +43,34 @@ export function handleError(e: unknown): NextResponse {
   }
   if (e instanceof ZodError) {
     return NextResponse.json({ error: 'Validation failed', issues: e.flatten() }, { status: 400 });
+  }
+  if (
+    e instanceof Prisma.PrismaClientInitializationError ||
+    (e instanceof Prisma.PrismaClientKnownRequestError &&
+      DATABASE_CONNECTION_ERROR_CODES.has(e.code))
+  ) {
+    captureError(e, { status: 503, code: 'DATABASE_UNAVAILABLE' });
+    return NextResponse.json(
+      {
+        error: 'The service is temporarily unavailable because its database cannot be reached.',
+        code: 'DATABASE_UNAVAILABLE',
+      },
+      { status: 503 }
+    );
+  }
+  if (
+    e instanceof Prisma.PrismaClientKnownRequestError &&
+    (e.code === 'P2021' || e.code === 'P2022')
+  ) {
+    captureError(e, { status: 503, code: 'DATABASE_SCHEMA_NOT_READY' });
+    return NextResponse.json(
+      {
+        error:
+          'The database is connected, but its schema is not initialized. Apply the project migrations to a development database before using this feature.',
+        code: 'DATABASE_SCHEMA_NOT_READY',
+      },
+      { status: 503 }
+    );
   }
   console.error('[auth] unhandled error:', e);
   captureError(e);

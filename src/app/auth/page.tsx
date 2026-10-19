@@ -136,6 +136,26 @@ function AuthContent() {
     return '';
   };
 
+  const validateSignInIdentifier = (identifier: string) => {
+    const value = identifier.trim();
+    if (!value) return 'Email address or phone number is required';
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return '';
+
+    const compact = value.replace(/[\s()-]/g, '');
+    const digits = compact.startsWith('+') ? compact.slice(1) : compact;
+    const validPhone = /^\d+$/.test(digits) &&
+      (compact.startsWith('+') ? digits.length >= 8 && digits.length <= 15 : digits.length === 10);
+
+    return validPhone ? '' : 'Enter a valid email address or phone number';
+  };
+
+  const normalizeSignInIdentifier = (identifier: string) => {
+    const value = identifier.trim();
+    if (value.includes('@')) return value.toLowerCase();
+    const digits = value.replace(/\D/g, '');
+    return `+${digits.length === 10 ? `91${digits}` : digits}`;
+  };
+
   const validatePassword = (pass: string) => {
     if (!pass) return 'Password is required';
     if (pass.length < 6) return 'Password must be at least 6 characters';
@@ -187,7 +207,7 @@ function AuthContent() {
   // Handlers for Sign In
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    const emailErr = validateEmail(signInEmail);
+    const emailErr = validateSignInIdentifier(signInEmail);
     const passErr = validatePassword(signInPassword);
 
     if (emailErr || passErr) {
@@ -200,7 +220,7 @@ function AuthContent() {
     setIsLoading(true);
 
     try {
-      const loggedUser = await login(signInEmail.trim(), signInPassword);
+      const loggedUser = await login(normalizeSignInIdentifier(signInEmail), signInPassword);
       const targetUrl =
         returnUrl !== '/'
           ? returnUrl
@@ -602,23 +622,24 @@ function AuthContent() {
                   {/* Email Field */}
                   <div>
                     <label className="block text-xs font-bold text-stone-700 mb-1.5">
-                      Email address
+                      Email or phone number
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
                         <Icon name="EnvelopeIcon" size={16} />
                       </div>
                       <input
-                        type="email"
+                        type="text"
+                        autoComplete="username"
                         value={signInEmail}
                         onChange={(e) => setSignInEmail(e.target.value)}
                         onBlur={() =>
                           setSignInErrors((prev) => ({
                             ...prev,
-                            email: validateEmail(signInEmail),
+                            email: validateSignInIdentifier(signInEmail),
                           }))
                         }
-                        placeholder="you@example.com"
+                        placeholder="you@example.com or +91 98765 43210"
                         className={`w-full pl-10 pr-4 py-3 bg-stone-50/50 border rounded-xl text-sm outline-none transition-all placeholder:text-stone-400 text-[#221A15] ${
                           signInErrors.email
                             ? 'border-red-500 focus:ring-2 focus:ring-red-200'
