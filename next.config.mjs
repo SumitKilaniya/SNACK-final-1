@@ -4,7 +4,6 @@ import { imageHosts } from './image-hosts.config.mjs';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     output: 'standalone',
-
     experimental: {
         cpus: 2,
     },
