@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { ApiError, handleError, safeEqual } from '@/lib/auth/errors';
+import { ApiError, safeEqual } from '@/lib/auth/errors';
 import {
   exchangeCodeForTokens,
   fetchGoogleUserinfo,
@@ -19,9 +18,7 @@ export async function GET(req: NextRequest) {
     const code = url.searchParams.get('code');
     const state = url.searchParams.get('state');
 
-    const store = await cookies();
-    const expected = store.get(GOOGLE_STATE_COOKIE)?.value;
-    store.delete(GOOGLE_STATE_COOKIE);
+    const expected = req.cookies.get(GOOGLE_STATE_COOKIE)?.value;
 
     if (!code || !state || !expected || !safeEqual(state, expected)) {
       throw new ApiError(400, 'OAuth state mismatch', 'GOOGLE_STATE_MISMATCH');
@@ -42,14 +39,30 @@ export async function GET(req: NextRequest) {
     });
 
     const { refreshToken } = await createSession(user, req);
-    setRefreshCookie(store, refreshToken);
 
     const origin = process.env.APP_ORIGIN ?? 'http://localhost:3000';
-    return NextResponse.redirect(`${origin}/?auth=success`);
+    const response = NextResponse.redirect(`${origin}/?auth=success`);
+    response.cookies.set(GOOGLE_STATE_COOKIE, '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 0,
+    });
+    setRefreshCookie(response.cookies, refreshToken);
+    return response;
   } catch (e) {
     console.error('[auth] google callback failed:', e);
     const origin = process.env.APP_ORIGIN ?? 'http://localhost:3000';
     // Redirect to the app with a flag rather than leaking error details.
-    return NextResponse.redirect(`${origin}/?auth=error`);
+    const response = NextResponse.redirect(`${origin}/?auth=error`);
+    response.cookies.set(GOOGLE_STATE_COOKIE, '', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 0,
+    });
+    return response;
   }
 }

@@ -43,6 +43,13 @@ pnpm run start
 Do not run `next dev` in production. Build with all dependencies installed;
 the Prisma CLI is a production dependency because deployments apply migrations.
 
+If the runtime log reports `Cannot find module 'react-dom/server.browser'`,
+the deployed runtime dependencies are incomplete or stale. From the application
+root, verify `node -e "require.resolve('react-dom/server.browser')"` succeeds.
+If it does not, clear Hostinger's build/dependency cache, reinstall with the
+locked pnpm command above, and rebuild; do not copy a local `node_modules` or
+`.next` directory into the deployment.
+
 Add the environment variables in the Hostinger app's environment/secret
 settings, not in source control. Ensure `NEXT_PUBLIC_SITE_URL` is available
 during the build because Next.js uses it for generated metadata. Set the same

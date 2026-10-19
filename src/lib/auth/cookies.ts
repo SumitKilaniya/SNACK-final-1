@@ -1,12 +1,10 @@
-import type { NextRequest } from 'next/server';
+import type { NextRequest, NextResponse } from 'next/server';
 
-/** Minimal structural type for the Next.js cookies() store we use. */
-interface CookieStore {
-  set(name: string, value: string, options?: Record<string, unknown>): void;
-  get(name: string): { name: string; value: string } | undefined;
-}
 import { ApiError } from './errors';
 import { REFRESH_TOKEN_TTL_DAYS } from './tokens';
+
+type CookieReader = Pick<NextRequest['cookies'], 'get'>;
+type CookieWriter = Pick<NextResponse['cookies'], 'set'>;
 
 export const REFRESH_COOKIE = 'sp_refresh';
 export const GOOGLE_STATE_COOKIE = 'sp_oauth_state';
@@ -21,15 +19,15 @@ export function refreshCookieOptions() {
   };
 }
 
-export function setRefreshCookie(store: Pick<CookieStore, 'set'>, token: string) {
+export function setRefreshCookie(store: CookieWriter, token: string) {
   store.set(REFRESH_COOKIE, token, refreshCookieOptions());
 }
 
-export function clearRefreshCookie(store: Pick<CookieStore, 'set'>) {
+export function clearRefreshCookie(store: CookieWriter) {
   store.set(REFRESH_COOKIE, '', { ...refreshCookieOptions(), maxAge: 0 });
 }
 
-export function getRefreshToken(store: CookieStore): string | undefined {
+export function getRefreshToken(store: CookieReader): string | undefined {
   return store.get(REFRESH_COOKIE)?.value;
 }
 

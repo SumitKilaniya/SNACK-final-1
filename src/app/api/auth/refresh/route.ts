@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { ApiError, handleError } from '@/lib/auth/errors';
 import { checkRateLimit, clientIp, requestContext } from '@/lib/auth/rate-limit';
 import { rotateRefreshToken } from '@/lib/auth/tokens';
@@ -15,6 +14,8 @@ import { auditLog } from '@/lib/auth/audit';
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
+  let clearCookieOnError = false;
+
   try {
     // CSRF: reject cross-origin requests that carry our cookie.
     assertSameOrigin(req);
@@ -27,14 +28,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const store = await cookies();
-    const raw = getRefreshToken(store);
+    const raw = getRefreshToken(req.cookies);
     if (!raw) throw new ApiError(401, 'No active session', 'NO_SESSION');
 
     const result = await rotateRefreshToken(raw, requestContext(req));
 
     if (!result.ok) {
-      clearRefreshCookie(store);
+      clearCookieOnError = true;
       if (result.reason === 'reuse') {
         // Reuse detection already revoked every session server-side.
         await auditLog({
@@ -47,13 +47,16 @@ export async function POST(req: NextRequest) {
       throw new ApiError(401, 'No active session', 'NO_SESSION');
     }
 
-    setRefreshCookie(store, result.refreshToken);
-    return NextResponse.json({
+    const response = NextResponse.json({
       accessToken: result.accessToken,
       expiresIn: 15 * 60,
       user: toSafeUser(result.user),
     });
+    setRefreshCookie(response.cookies, result.refreshToken);
+    return response;
   } catch (e) {
-    return handleError(e);
+    const response = handleError(e);
+    if (clearCookieOnError) clearRefreshCookie(response.cookies);
+    return response;
   }
 }

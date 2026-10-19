@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { prisma } from '@/lib/auth/prisma';
 import { ApiError, handleError } from '@/lib/auth/errors';
 import { loginSchema } from '@/lib/auth/validation';
@@ -111,11 +110,11 @@ export async function POST(req: NextRequest) {
     });
 
     const { accessToken, refreshToken, expiresIn } = await createSession(user, req);
-    const store = await cookies();
-    setRefreshCookie(store, refreshToken);
     await auditLog({ userId: user.id, action: 'login', ...requestContext(req) });
 
-    return NextResponse.json({ accessToken, expiresIn, user: toSafeUser(user) });
+    const response = NextResponse.json({ accessToken, expiresIn, user: toSafeUser(user) });
+    setRefreshCookie(response.cookies, refreshToken);
+    return response;
   } catch (e) {
     return handleError(e);
   }

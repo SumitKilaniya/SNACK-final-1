@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { prisma } from '@/lib/auth/prisma';
 import { ApiError, handleError } from '@/lib/auth/errors';
 import { registerSchema } from '@/lib/auth/validation';
@@ -57,10 +56,8 @@ export async function POST(req: NextRequest) {
     });
 
     const { accessToken, refreshToken, expiresIn } = await createSession(user, req);
-    const store = await cookies();
-    setRefreshCookie(store, refreshToken);
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         accessToken,
         expiresIn,
@@ -69,6 +66,8 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 }
     );
+    setRefreshCookie(response.cookies, refreshToken);
+    return response;
   } catch (e) {
     return handleError(e);
   }
