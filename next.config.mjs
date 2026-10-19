@@ -3,18 +3,26 @@ import { imageHosts } from './image-hosts.config.mjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // Hostinger production build settings
+    output: 'standalone',
+
     experimental: {
         cpus: 2,
     },
 
-    // Temporary diagnostic: disable production JS minification
+    // Include runtime dependencies that may be missed by output tracing.
+    outputFileTracingIncludes: {
+        '/*': [
+            './node_modules/@node-rs/argon2/**/*',
+            './node_modules/@node-rs/argon2-linux-x64-gnu/**/*',
+            './node_modules/react-dom/**/*',
+        ],
+    },
+
     webpack: (config, { dev }) => {
         if (!dev) {
             config.optimization.minimize = false;
         }
 
-        // Component tagging is opt-in for development
         if (dev && process.env.ENABLE_COMPONENT_TAGGER === 'true') {
             config.module.rules.push({
                 test: /\.(jsx|tsx)$/,
