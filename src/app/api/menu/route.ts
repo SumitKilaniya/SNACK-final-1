@@ -13,14 +13,6 @@ const FALLBACK_BRANCH = {
   servicePincodes: ['560076', '560078', '560103'],
 };
 
-type MenuBranch = {
-  id: string;
-  name: string;
-  city: string | null;
-  servicePincodes: string | null;
-  isActive: boolean;
-};
-
 export async function GET(req: NextRequest) {
   try {
     const requested =
@@ -35,28 +27,29 @@ export async function GET(req: NextRequest) {
           orderBy: { name: 'asc' },
         });
 
-    const branch: MenuBranch =
-      dbBranch && dbBranch.isActive
-        ? dbBranch
-        : {
-            id: requested || FALLBACK_BRANCH.id,
-            name: FALLBACK_BRANCH.name,
-            city: FALLBACK_BRANCH.city,
-            servicePincodes: JSON.stringify(
-              FALLBACK_BRANCH.servicePincodes
-            ),
-            isActive: true,
-          };
+    const branchId =
+      dbBranch?.isActive
+        ? dbBranch.id
+        : requested || FALLBACK_BRANCH.id;
 
-    const items = await getMenuForBranch(branch.id);
+    const branchDetails = dbBranch?.isActive
+      ? {
+          id: dbBranch.id,
+          name: dbBranch.name,
+          city: dbBranch.city,
+          servicePincodes: parsePincodes(dbBranch),
+        }
+      : {
+          id: branchId,
+          name: FALLBACK_BRANCH.name,
+          city: FALLBACK_BRANCH.city,
+          servicePincodes: FALLBACK_BRANCH.servicePincodes,
+        };
+
+    const items = await getMenuForBranch(branchId);
 
     return NextResponse.json({
-      branch: {
-        id: branch.id,
-        name: branch.name,
-        city: branch.city,
-        servicePincodes: parsePincodes(branch),
-      },
+      branch: branchDetails,
       items,
     });
   } catch (error) {
