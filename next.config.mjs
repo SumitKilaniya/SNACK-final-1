@@ -4,13 +4,16 @@ import { imageHosts } from './image-hosts.config.mjs';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     output: 'standalone',
+
     experimental: {
         cpus: 2,
     },
 
-    // Include runtime dependencies that may be missed by output tracing.
     outputFileTracingIncludes: {
         '/*': [
+            './node_modules/.prisma/**/*',
+            './node_modules/@prisma/client/**/*',
+            './node_modules/prisma/**/*',
             './node_modules/@node-rs/argon2/**/*',
             './node_modules/@node-rs/argon2-linux-x64-gnu/**/*',
             './node_modules/react-dom/**/*',
