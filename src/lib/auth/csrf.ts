@@ -50,6 +50,7 @@ export function assertSameOrigin(req: NextRequest): void {
   // x-forwarded-host carries the public hostname when a proxy rewrites Host.
   addHost(req.headers.get('x-forwarded-host'));
   addHost(req.headers.get('host'));
+  addHost(process.env.HOSTNAME);
   if (process.env.APP_ORIGIN) {
     try {
       addHost(new URL(process.env.APP_ORIGIN).hostname);
