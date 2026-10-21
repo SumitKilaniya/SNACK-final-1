@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMenuForBranch, parsePincodes } from '@/lib/catalog';
 import { prisma } from '@/lib/auth/prisma';
-import { MENU } from '@/lib/menu-data';
+import { menuItems } from '@/lib/menu-data';
 
 export const runtime = 'nodejs';
 export const revalidate = 0;
@@ -42,19 +42,19 @@ export async function GET(req: NextRequest) {
     const items = dbItems.length > 0
       ? dbItems
       : MENU.map((item) => ({
-          id: item.id,
-          name: item.name,
-          description: item.desc,
-          category: item.category,
-          basePrice: item.price,
-          price: item.price,
-          priceOverridden: false,
-          isAvailable: true,
-          isVeg: item.veg,
-          imageUrl: item.imageUrl,
-          isBestseller: item.isBestseller ?? false,
-          badge: item.badge ?? null,
-          rating: 4.5,
+          id: item.key,
+name: item.name,
+description: item.description,
+category: item.category ?? item.categoryId,
+basePrice: item.price,
+price: item.price,
+priceOverridden: false,
+isAvailable: true,
+isVeg: item.isVeg,
+imageUrl: item.image,
+isBestseller: item.isBestseller ?? false,
+badge: item.badge ?? null,
+rating: item.rating,
         }));
 
     return NextResponse.json({ branch, items });
