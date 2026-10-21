@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
 
     const items = dbItems.length > 0
       ? dbItems
-      : MENU.map((item) => ({
+      : menuItems.map((item) => ({
           id: item.key,
 name: item.name,
 description: item.description,
